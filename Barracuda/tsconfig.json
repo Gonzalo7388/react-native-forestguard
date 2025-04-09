@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "skipLibCheck": true,
+    "exclude": ["node_modules"],
+    "baseUrl": "./",
+    "jsx": "react-native",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "moduleResolution": "node",
+    "skipLibCheck": true,
+    "paths": {
+      "@react-navigation/*": ["node_modules/@react-navigation/*"],
+      "@/*": ["app/*"]
+    },
+    "typeRoots": [
+      "./node_modules/@types",
+      "./src/@types"
+    ],
+    "lib": ["esnext"],
+    "types": ["react-native"]  // Solo react-native
+  },
+  "exclude": [
+    "node_modules"
+  ]
+}
