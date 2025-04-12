@@ -43,7 +43,7 @@ export default function App() {
   const screenOptions = ({ route }: { route: { name: keyof RootTabParamList } }): BottomTabNavigationOptions => ({
     tabBarIcon: ({ color, size }: TabBarIconProps) => {
       let iconName: keyof typeof Ionicons.glyphMap = 'help'; // Valor por defecto
-      
+
       switch (route.name) {
         case 'Equipos': iconName = 'people'; break;
         case 'Mapa': iconName = 'map'; break;
@@ -59,15 +59,14 @@ export default function App() {
 
   return (
     <NavigationContainer>
-      <View style={styles.container}>
-        <StatusBar style="light" />
-        <Tab.Navigator screenOptions={screenOptions}>
-          <Tab.Screen name="Equipos" component={EquiposScreen} />
-          <Tab.Screen name="Mapa" component={MapaScreen} />
-          <Tab.Screen name="Comunicacion" component={ComunicacionScreen} />
-        </Tab.Navigator>
-      </View>
+      <StatusBar style="light" />
+      <Tab.Navigator screenOptions={screenOptions}>
+        <Tab.Screen name="Equipos" component={EquiposScreen} />
+        <Tab.Screen name="Mapa" component={MapaScreen} />
+        <Tab.Screen name="Comunicacion" component={ComunicacionScreen} />
+      </Tab.Navigator>
     </NavigationContainer>
+
   );
 }
 
