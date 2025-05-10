@@ -1,36 +1,25 @@
-import React from 'react';
+import React, { useState } from 'react'; // Importar useState
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, ActivityIndicator } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { BottomTabNavigationOptions } from '@react-navigation/bottom-tabs/lib/typescript/src/types';
+import { createStackNavigator } from '@react-navigation/stack';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useAssets } from 'expo-asset';
 
 // Importaciones de pantallas
-import EquiposScreen from './app/screens/EquiposScreen';
-import MapaScreen from './app/screens/MapaScreen';
-import ComunicacionScreen from './app/screens/ComunicacionScreen';
+import LoginScreen from './app/screens/auth/LoginScreen';
+import MapaScreen from './app/screens/admin/MapaScreen';
 
-type RootTabParamList = {
-  Equipos: undefined;
-  Mapa: undefined;
-  Comunicacion: undefined;
-};
-
-type TabBarIconProps = {
-  color: string;
-  size: number;
-};
-
-const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
 
 export default function App() {
-  const [assetsLoaded] = useAssets([
+  const [assetsLoaded] = useAssets([ // Cargar los assets
     require('./assets/icon.png'),
     require('./assets/splash-icon.png'),
-    require('./assets/adaptive-icon.png')
+    require('./assets/adaptive-icon.png'),
   ]);
+
+  const [isAuthenticated, setIsAuthenticated] = useState(false); // Estado de autenticación
 
   if (!assetsLoaded) {
     return (
@@ -40,47 +29,23 @@ export default function App() {
     );
   }
 
-  const screenOptions = ({ route }: { route: { name: keyof RootTabParamList } }): BottomTabNavigationOptions => ({
-    tabBarIcon: ({ color, size }: TabBarIconProps) => {
-      let iconName: keyof typeof Ionicons.glyphMap = 'help'; // Valor por defecto
-
-      switch (route.name) {
-        case 'Equipos': iconName = 'people'; break;
-        case 'Mapa': iconName = 'map'; break;
-        case 'Comunicacion': iconName = 'radio'; break;
-      }
-      return <Ionicons name={iconName} size={size} color={color} />;
-    },
-    tabBarActiveTintColor: '#e74c3c',
-    tabBarInactiveTintColor: '#95a5a6',
-    tabBarStyle: styles.tabBar,
-    headerShown: false,
-  });
-
   return (
     <NavigationContainer>
       <StatusBar style="light" />
-      <Tab.Navigator screenOptions={screenOptions}>
-        <Tab.Screen name="Equipos" component={EquiposScreen} />
-        <Tab.Screen name="Mapa" component={MapaScreen} />
-        <Tab.Screen name="Comunicacion" component={ComunicacionScreen} />
-      </Tab.Navigator>
-    </NavigationContainer>
+      <Stack.Navigator initialRouteName={isAuthenticated ? 'Mapa' : 'Login'}>
+        {/* Pantalla de Login */}
+        <Stack.Screen name="Login">
+          {(props) => <LoginScreen {...props} setIsAuthenticated={setIsAuthenticated} />}
+        </Stack.Screen>
 
+        {/* Pantalla de Mapa */}
+        <Stack.Screen name="Mapa" component={MapaScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#121212',
-  },
-  tabBar: {
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-    borderTopWidth: 0,
-    height: 60,
-    paddingBottom: 5,
-  },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
