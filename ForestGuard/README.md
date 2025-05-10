@@ -25,6 +25,9 @@ Instala las dependencias:
 
 `npm install`
 
+o
+`npm install --legacy-peer-deps`
+
 Para correr el proyecto, usa el siguiente comando:
 
 `npx expo start --tunnel`
