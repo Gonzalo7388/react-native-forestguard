@@ -1,25 +1,23 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, StyleSheet, Text, Alert } from 'react-native';
+import { View, TextInput, Button, StyleSheet, Text, Alert, TouchableOpacity } from 'react-native';
 
-// Definir el tipo de las props para LoginScreen
-type LoginScreenProps = {
-  navigation: any; // Si prefieres un tipo más estricto, puedes usar 'StackNavigationProp<RootStackParamList, 'Login'>'
+const LoginScreen = ({
+  navigation,
+  setIsAuthenticated,
+}: {
+  navigation: any;
   setIsAuthenticated: (authenticated: boolean) => void;
-};
-
-const LoginScreen = ({ navigation, setIsAuthenticated }: LoginScreenProps) => {
+}) => {
   const [usuario, setUsuario] = useState('');
   const [contrasena, setContrasena] = useState('');
 
   const handleLogin = () => {
-    // Datos de prueba
     const usuarioPrueba = 'admin';
     const contrasenaPrueba = 'admin';
 
     if (usuario === usuarioPrueba && contrasena === contrasenaPrueba) {
-      // Cambiar el estado de autenticación
       setIsAuthenticated(true);
-      navigation.replace('Mapa'); // Redirige a la pantalla del mapa
+      navigation.replace('Mapa');
     } else {
       Alert.alert('Error', 'Credenciales incorrectas');
     }
@@ -28,20 +26,27 @@ const LoginScreen = ({ navigation, setIsAuthenticated }: LoginScreenProps) => {
   return (
     <View style={styles.container}>
       <Text style={styles.titulo}>Iniciar sesión</Text>
+
       <TextInput
         style={styles.input}
         placeholder="Usuario"
+        placeholderTextColor="#7F5F16"
         value={usuario}
         onChangeText={setUsuario}
       />
+
       <TextInput
         style={styles.input}
         placeholder="Contraseña"
+        placeholderTextColor="#7F5F16"
         secureTextEntry
         value={contrasena}
         onChangeText={setContrasena}
       />
-      <Button title="Iniciar sesión" onPress={handleLogin} />
+
+      <TouchableOpacity style={styles.boton} onPress={handleLogin}>
+        <Text style={styles.botonTexto}>Iniciar sesión</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -49,22 +54,44 @@ const LoginScreen = ({ navigation, setIsAuthenticated }: LoginScreenProps) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#422E13', // Fondo marrón oscuro
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
   },
   titulo: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
-    marginBottom: 20,
+    color: '#DBB95F', // Amarillo claro para el título
+    marginBottom: 30,
   },
   input: {
     width: '100%',
-    padding: 10,
-    marginBottom: 10,
+    backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
+    borderColor: '#878532', // Verde amarillento pantanoso
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 15,
+    fontSize: 16,
+    color: '#422E13', // Textos en color marrón oscuro
+  },
+  boton: {
+    backgroundColor: '#537636', // Verde pantanoso oscuro
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    borderRadius: 8,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
+  botonTexto: {
+    color: '#FFFFFF', // Blanco para el texto del botón
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
 

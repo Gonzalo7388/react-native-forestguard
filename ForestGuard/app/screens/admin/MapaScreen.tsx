@@ -2,6 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, ActivityIndicator, Alert, Text, FlatList } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { TouchableOpacity } from 'react-native'; // Agrega esta línea si no la tienes
+
+
 
 type Usuario = {
   id: string;
@@ -15,6 +20,13 @@ const usuariosPrueba: Usuario[] = [
   { id: '2', nombre: 'Ana Torres', rol: 'Jefe de equipo', conectado: true },
   { id: '3', nombre: 'Luis Ramos', rol: 'Talador', conectado: false },
 ];
+
+// Define el tipo de navegación para el Stack
+type RootStackParamList = {
+  Mapa: undefined;
+  Estadisticas: undefined;
+  Control: undefined;
+};
 
 const MapaScreen = () => {
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
@@ -36,6 +48,8 @@ const MapaScreen = () => {
       return () => clearInterval(interval);
     })();
   }, []);
+
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   if (!location) {
     return (
@@ -102,55 +116,109 @@ const MapaScreen = () => {
           )}
         />
       </View>
+
+      <View style={styles.botonesContainer}>
+        <TouchableOpacity
+          style={styles.boton}
+          onPress={() => navigation.navigate('Estadisticas')}
+        >
+          <Text style={styles.botonTexto}>Estadísticas</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.boton}
+          onPress={() => navigation.navigate('Control')}
+        >
+          <Text style={styles.botonTexto}>Control de Equipos</Text>
+        </TouchableOpacity>
+      </View>
+
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  map: { flex: 2 },
-  loader: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  container: {
+    flex: 1,
+    backgroundColor: '#422E13',
+  },
+  map: {
+    flex: 2,
+  },
+  loader: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#422E13',
+  },
   grillaContainer: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#422E13',
     padding: 10,
-    borderTopWidth: 1,
-    borderTopColor: '#ccc',
+    borderTopWidth: 2,
+    borderTopColor: '#878532',
   },
   tituloGrilla: {
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: 'bold',
-    marginBottom: 10,
-    color: '#333',
+    color: '#DBB95F', // Amarillo claro
+    marginBottom: 12,
     textAlign: 'center',
   },
   usuarioCard: {
     flex: 1,
-    margin: 10,
-    padding: 15,
-    borderRadius: 8,
-    backgroundColor: '#f4f4f4',
+    margin: 8,
+    padding: 14,
+    borderRadius: 10,
+    backgroundColor: '#7F5F16', // Marrón claro
     alignItems: 'center',
     justifyContent: 'center',
-    elevation: 3, // Sombra
+    elevation: 3,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.2,
     shadowRadius: 4,
   },
   usuarioActivo: {
-    color: 'green',
+    color: '#FFFFFF', // Blanco para resaltar
     fontSize: 16,
     fontWeight: 'bold',
   },
   usuarioInactivo: {
-    color: 'gray',
+    color: '#878532', // Verde amarillento pantanoso
     fontSize: 16,
   },
   rolText: {
     fontSize: 14,
-    color: '#777',
+    color: '#DBB95F', // Amarillo claro
+    marginTop: 4,
+  },
+  botonesContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    paddingVertical: 12,
+    backgroundColor: '#422E13',
+  },
+  boton: {
+    backgroundColor: '#537636', // Verde pantanoso oscuro
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  botonTexto: {
+    color: '#FFFFFF', // Blanco para los botones
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
+
+
 
 export default MapaScreen;

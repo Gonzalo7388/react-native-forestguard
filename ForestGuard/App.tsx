@@ -5,10 +5,13 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useAssets } from 'expo-asset';
+import AdminNavigator from './app/navigation/AdminNavigator';
 
 // Importaciones de pantallas
 import LoginScreen from './app/screens/auth/LoginScreen';
 import MapaScreen from './app/screens/admin/MapaScreen';
+import EstadisticasScreen from './app/screens/admin/EstadisticasScreen';
+import ControlEquiposScreen from './app/screens/admin/ControlEquiposScreen'; // Importar la nueva pantalla
 
 const Stack = createStackNavigator();
 
@@ -38,11 +41,14 @@ export default function App() {
           {(props) => <LoginScreen {...props} setIsAuthenticated={setIsAuthenticated} />}
         </Stack.Screen>
 
-        {/* Pantalla de Mapa */}
+        {/* Pantallas de Admin */}
         <Stack.Screen name="Mapa" component={MapaScreen} />
+        <Stack.Screen name="Estadisticas" component={EstadisticasScreen} />
+        <Stack.Screen name="Control" component={ControlEquiposScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
+
 }
 
 const styles = StyleSheet.create({
