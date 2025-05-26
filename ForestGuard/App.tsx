@@ -5,13 +5,13 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useAssets } from 'expo-asset';
-import AdminNavigator from './app/navigation/AdminNavigator';
+import AdminNavigator from './src/navigation/AdminNavigator';
 
 // Importaciones de pantallas
-import LoginScreen from './app/screens/auth/LoginScreen';
-import MapaScreen from './app/screens/admin/MapaScreen';
-import EstadisticasScreen from './app/screens/admin/EstadisticasScreen';
-import ControlEquiposScreen from './app/screens/admin/ControlEquiposScreen'; // Importar la nueva pantalla
+import LoginScreen from './src/screens/auth/LoginScreen';
+import MapaScreen from './src/screens/admin/MapaScreen';
+import EstadisticasScreen from './src/screens/admin/EstadisticasScreen';
+import ControlEquiposScreen from './src/screens/admin/ControlEquiposScreen'; // Importar la nueva pantalla
 
 const Stack = createStackNavigator();
 
