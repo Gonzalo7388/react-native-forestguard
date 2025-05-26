@@ -16,12 +16,12 @@ const LoginScreen = ({
     const contrasenaPrueba = 'admin';
 
     if (usuario === usuarioPrueba && contrasena === contrasenaPrueba) {
-      setIsAuthenticated(true);
-      navigation.replace('Mapa');
+      setIsAuthenticated(true); // Esto es suficiente
     } else {
       Alert.alert('Error', 'Credenciales incorrectas');
     }
   };
+
 
   return (
     <View style={styles.container}>

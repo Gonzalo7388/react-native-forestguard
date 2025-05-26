@@ -117,21 +117,6 @@ const MapaScreen = () => {
         />
       </View>
 
-      <View style={styles.botonesContainer}>
-        <TouchableOpacity
-          style={styles.boton}
-          onPress={() => navigation.navigate('Estadisticas')}
-        >
-          <Text style={styles.botonTexto}>Estadísticas</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.boton}
-          onPress={() => navigation.navigate('Control')}
-        >
-          <Text style={styles.botonTexto}>Control de Equipos</Text>
-        </TouchableOpacity>
-      </View>
 
     </View>
   );

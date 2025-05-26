@@ -1,14 +1,25 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-import LoginScreen from '../screens/auth/LoginScreen'; // Asegúrate de que la ruta sea correcta
-import AdminNavigator from './AdminNavigator'; // El navegador para las pantallas de admin
+import LoginScreen from '../screens/auth/LoginScreen';
+import AdminNavigator from './AdminNavigator';
 
 const Stack = createStackNavigator();
 
-const RootNavigator = () => {
+type RootNavigatorProps = {
+  isAuthenticated: boolean;
+  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+const RootNavigator: React.FC<RootNavigatorProps> = ({ isAuthenticated, setIsAuthenticated }) => {
   return (
-    <Stack.Navigator initialRouteName="Login">
-      <Stack.Screen name="Admin" component={AdminNavigator} />
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      {!isAuthenticated ? (
+        <Stack.Screen name="Login">
+          {(props) => <LoginScreen {...props} setIsAuthenticated={setIsAuthenticated} />}
+        </Stack.Screen>
+      ) : (
+        <Stack.Screen name="Admin" component={AdminNavigator} />
+      )}
     </Stack.Navigator>
   );
 };
