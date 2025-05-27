@@ -1,21 +1,24 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import LoginScreen from '../screens/auth/LoginScreen';
 import AdminNavigator from './AdminNavigator';
+import { AuthContext } from '../contexts/AuthContext';
 
 const Stack = createStackNavigator();
 
-type RootNavigatorProps = {
-  isAuthenticated: boolean;
-  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
-};
+const RootNavigator = () => {
+  const auth = useContext(AuthContext);
 
-const RootNavigator: React.FC<RootNavigatorProps> = ({ isAuthenticated, setIsAuthenticated }) => {
+  if (!auth || typeof auth.setIsAuthenticated !== 'function') {
+  // Opcional: puedes mostrar una pantalla de carga
+  return null; // O un loader temporal
+}
+
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      {!isAuthenticated ? (
+      {!auth.isAuthenticated ? (
         <Stack.Screen name="Login">
-          {(props) => <LoginScreen {...props} setIsAuthenticated={setIsAuthenticated} />}
+          {(props) => <LoginScreen {...props} setIsAuthenticated={auth.setIsAuthenticated} />}
         </Stack.Screen>
       ) : (
         <Stack.Screen name="Admin" component={AdminNavigator} />
@@ -25,3 +28,5 @@ const RootNavigator: React.FC<RootNavigatorProps> = ({ isAuthenticated, setIsAut
 };
 
 export default RootNavigator;
+
+
