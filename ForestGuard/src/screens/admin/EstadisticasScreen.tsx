@@ -1,12 +1,13 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Dimensions } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
-import { Card } from 'react-native-paper';
-import Header from '../../components/Header'; // Ya estaba importado
+import { Card } from 'react-native-paper'; // Assuming Card component is from react-native-paper
+import Header from '../../components/Header'; // Header component is assumed to exist
 
 const screenWidth = Dimensions.get('window').width;
 
 const EstadisticasScreen = () => {
+  // Sample statistics data
   const datosEstadisticas = {
     horasTrabajadas: 1234,
     incidentesReportados: 5,
@@ -14,6 +15,7 @@ const EstadisticasScreen = () => {
     temperaturaPromedio: 25,
   };
 
+  // Data for the line chart
   const dataGrafico = {
     labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
     datasets: [
@@ -24,12 +26,14 @@ const EstadisticasScreen = () => {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#422E13' }}>
+    <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}> {/* White background for the main view */}
+      {/* Header component */}
       <Header title="Estadísticas" />
 
       <ScrollView style={styles.container}>
         <Text style={styles.titulo}>Estadísticas Generales</Text>
 
+        {/* Container for statistic cards */}
         <View style={styles.cardContainer}>
           <Card style={styles.card}>
             <Text style={styles.cardTitle}>Horas Trabajadas</Text>
@@ -52,28 +56,29 @@ const EstadisticasScreen = () => {
         <Text style={styles.graficoTitulo}>Horas Trabajadas por Mes</Text>
         <LineChart
           data={dataGrafico}
-          width={screenWidth - 40}
+          width={screenWidth - 40} // Chart width (screen width minus padding)
           height={220}
           chartConfig={{
-            backgroundColor: '#1cc910',
-            backgroundGradientFrom: '#0e1a2b',
-            backgroundGradientTo: '#0e1a2b',
-            decimalPlaces: 2,
-            color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-            labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+            backgroundColor: '#7ED321', // Lime green background for the chart
+            backgroundGradientFrom: '#7ED321', // Lime green gradient start
+            backgroundGradientTo: '#7ED321', // Lime green gradient end
+            decimalPlaces: 0, // No decimal places for data on the chart
+            color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`, // White lines and labels
+            labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`, // White labels
             style: {
               borderRadius: 16,
             },
             propsForDots: {
-              r: '6',
-              strokeWidth: '2',
-              stroke: '#ffa726',
+              r: '6', // Radius of data points
+              strokeWidth: '2', // Stroke width of data points
+              stroke: '#FFFFFF', // White stroke for data points
             },
           }}
-          bezier
+          bezier // Smooth curves for the line chart
           style={{
             marginVertical: 8,
             borderRadius: 16,
+            alignSelf: 'center' // Center the chart
           }}
         />
       </ScrollView>
@@ -85,14 +90,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#422E13',
+    backgroundColor: '#FFFFFF', // White background
   },
   titulo: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
     textAlign: 'center',
-    color: '#DBB95F',
+    color: '#000000', // Black title
   },
   cardContainer: {
     flexDirection: 'row',
@@ -101,9 +106,9 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   card: {
-    width: '48%',
+    width: '48%', // Two cards per row
     marginBottom: 10,
-    backgroundColor: '#7F5F16',
+    backgroundColor: '#7ED321', // Lime green background for cards
     padding: 15,
     borderRadius: 10,
     shadowColor: '#000',
@@ -116,18 +121,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 5,
-    color: '#FFFFFF',
+    color: '#FFFFFF', // White text for card titles
   },
   cardData: {
     fontSize: 18,
-    color: '#DBB95F',
+    color: '#000000', // Black text for card data
   },
   graficoTitulo: {
     fontSize: 18,
     fontWeight: 'bold',
     marginVertical: 20,
     textAlign: 'center',
-    color: '#DBB95F',
+    color: '#000000', // Black title for chart
   },
 });
 

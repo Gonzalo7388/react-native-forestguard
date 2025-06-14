@@ -3,8 +3,9 @@ import React, { useContext } from 'react';
 import { View, Text, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import { DrawerContentScrollView } from '@react-navigation/drawer';
 import { AuthContext } from '../../contexts/AuthContext';
+import { DrawerContentComponentProps } from '@react-navigation/drawer';
 
-export default function DrawerContent() {
+export default function DrawerContent({ navigation }: DrawerContentComponentProps) {
   const context = useContext(AuthContext);
 
   if (!context) throw new Error('AuthContext is required');
@@ -22,18 +23,35 @@ export default function DrawerContent() {
     <DrawerContentScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Menú</Text>
 
-      <TouchableOpacity style={styles.option} onPress={() => alert('Funcionalidad futura')}>
-        <Text style={styles.text}>Opción 1</Text>
+      <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('MapaRecorrido')}>
+        <Text style={styles.text}>Mapa de Recorrido</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.option} onPress={() => alert('Funcionalidad futura')}>
-        <Text style={styles.text}>Opción 2</Text>
+      <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('Asistencia')}>
+        <Text style={styles.text}>Registro de Asistencia</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('ControlEquipamiento')}>
+        <Text style={styles.text}>Control de Equipamiento</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('EvaluacionPostJornada')}>
+        <Text style={styles.text}>Evaluación Post Jornada</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('ResumenTrabajador')}>
+        <Text style={styles.text}>Resumen del Trabajador</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('Configuracion')}>
+        <Text style={styles.text}>Configuración</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.option} onPress={handleLogout}>
         <Text style={[styles.text, { color: 'red' }]}>Cerrar sesión</Text>
       </TouchableOpacity>
     </DrawerContentScrollView>
+
   );
 }
 
