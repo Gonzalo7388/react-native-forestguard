@@ -11,14 +11,18 @@ type HeaderProps = {
 export default function Header({ title }: HeaderProps) {
   const navigation = useNavigation<any>();
 
-  const openMenu = () => {
-    navigation.navigate('Menú'); // definido como modal en AdminNavigator
+  const openDrawer = () => {
+    if (navigation.openDrawer) {
+      navigation.openDrawer(); // abre el Drawer
+    } else {
+      console.warn('openDrawer no está disponible en este stack');
+    }
   };
 
   return (
     <SafeAreaView style={styles.safeContainer}>
       <View style={styles.container}>
-        <TouchableOpacity onPress={openMenu}>
+        <TouchableOpacity onPress={openDrawer}>
           <Ionicons name="menu" size={28} color="#fff" />
         </TouchableOpacity>
         <Text style={styles.title}>{title}</Text>

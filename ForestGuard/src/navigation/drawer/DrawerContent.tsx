@@ -1,32 +1,25 @@
+// src/navigation/drawer/DrawerContent.tsx
 import React, { useContext } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { View, Text, StyleSheet, Alert, TouchableOpacity } from 'react-native';
+import { DrawerContentScrollView } from '@react-navigation/drawer';
 import { AuthContext } from '../../contexts/AuthContext';
 
-export default function MenuScreen() {
-  const navigation = useNavigation<any>();
+export default function DrawerContent() {
   const context = useContext(AuthContext);
 
-  if (!context) {
-    // Si no está envuelto en <AuthContext.Provider>, lanza error
-    throw new Error('MenuScreen must be used within an AuthContext.Provider');
-  }
+  if (!context) throw new Error('AuthContext is required');
 
   const { setIsAuthenticated } = context;
 
   const handleLogout = () => {
-    Alert.alert(
-      'Cerrar sesión',
-      '¿Estás seguro de que deseas cerrar sesión?',
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        { text: 'Cerrar sesión', style: 'destructive', onPress: () => setIsAuthenticated(false) }
-      ]
-    );
+    Alert.alert('Cerrar sesión', '¿Seguro que deseas salir?', [
+      { text: 'Cancelar', style: 'cancel' },
+      { text: 'Cerrar sesión', style: 'destructive', onPress: () => setIsAuthenticated(false) },
+    ]);
   };
 
   return (
-    <View style={styles.container}>
+    <DrawerContentScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Menú</Text>
 
       <TouchableOpacity style={styles.option} onPress={() => alert('Funcionalidad futura')}>
@@ -40,7 +33,7 @@ export default function MenuScreen() {
       <TouchableOpacity style={styles.option} onPress={handleLogout}>
         <Text style={[styles.text, { color: 'red' }]}>Cerrar sesión</Text>
       </TouchableOpacity>
-    </View>
+    </DrawerContentScrollView>
   );
 }
 
