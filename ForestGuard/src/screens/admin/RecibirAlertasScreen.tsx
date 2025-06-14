@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'; // Para iconos como el micrófono y la cámara
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'; // Para iconos de animales
 import { useNavigation } from '@react-navigation/native'; // Hook para la navegación
+import Header from '../../components/Header';
 
 // Definición de tipos para las alertas (puedes expandir esto según tus necesidades)
 interface Alert {
@@ -108,7 +109,9 @@ const RecibirAlertasScreen = () => {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
+      <Header title="Alertas" />
+
       {/* Header simulado basado en la imagen */}
       <View style={styles.header}>
         <Icon name="tree" size={28} color="#4CAF50" />
@@ -185,7 +188,7 @@ const RecibirAlertasScreen = () => {
           </View>
         </View>
       </Modal>
-    </SafeAreaView>
+    </View>
   );
 };
 

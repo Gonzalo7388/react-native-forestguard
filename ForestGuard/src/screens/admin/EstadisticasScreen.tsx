@@ -1,22 +1,21 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Dimensions } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
-import { Dimensions } from 'react-native';
 import { Card } from 'react-native-paper';
+import Header from '../../components/Header'; // Ya estaba importado
 
 const screenWidth = Dimensions.get('window').width;
 
 const EstadisticasScreen = () => {
-  // Datos de ejemplo
   const datosEstadisticas = {
     horasTrabajadas: 1234,
     incidentesReportados: 5,
     trabajadoresActivos: 10,
-    temperaturaPromedio: 25, // Grados Celsius
+    temperaturaPromedio: 25,
   };
 
   const dataGrafico = {
-    labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'], // Meses
+    labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
     datasets: [
       {
         data: [100, 120, 130, 110, 140, 150],
@@ -25,56 +24,60 @@ const EstadisticasScreen = () => {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.titulo}>Estadísticas Generales</Text>
+    <View style={{ flex: 1, backgroundColor: '#422E13' }}>
+      <Header title="Estadísticas" />
 
-      <View style={styles.cardContainer}>
-        <Card style={styles.card}>
-          <Text style={styles.cardTitle}>Horas Trabajadas</Text>
-          <Text style={styles.cardData}>{datosEstadisticas.horasTrabajadas} horas</Text>
-        </Card>
-        <Card style={styles.card}>
-          <Text style={styles.cardTitle}>Incidentes Reportados</Text>
-          <Text style={styles.cardData}>{datosEstadisticas.incidentesReportados}</Text>
-        </Card>
-        <Card style={styles.card}>
-          <Text style={styles.cardTitle}>Trabajadores Activos</Text>
-          <Text style={styles.cardData}>{datosEstadisticas.trabajadoresActivos}</Text>
-        </Card>
-        <Card style={styles.card}>
-          <Text style={styles.cardTitle}>Temperatura Promedio</Text>
-          <Text style={styles.cardData}>{datosEstadisticas.temperaturaPromedio}°C</Text>
-        </Card>
-      </View>
+      <ScrollView style={styles.container}>
+        <Text style={styles.titulo}>Estadísticas Generales</Text>
 
-      <Text style={styles.graficoTitulo}>Horas Trabajadas por Mes</Text>
-      <LineChart
-        data={dataGrafico}
-        width={screenWidth - 40} // Ajusta el gráfico para que se vea bien
-        height={220}
-        chartConfig={{
-          backgroundColor: '#1cc910',
-          backgroundGradientFrom: '#0e1a2b',
-          backgroundGradientTo: '#0e1a2b',
-          decimalPlaces: 2, // Muestra dos decimales
-          color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-          labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-          style: {
+        <View style={styles.cardContainer}>
+          <Card style={styles.card}>
+            <Text style={styles.cardTitle}>Horas Trabajadas</Text>
+            <Text style={styles.cardData}>{datosEstadisticas.horasTrabajadas} horas</Text>
+          </Card>
+          <Card style={styles.card}>
+            <Text style={styles.cardTitle}>Incidentes Reportados</Text>
+            <Text style={styles.cardData}>{datosEstadisticas.incidentesReportados}</Text>
+          </Card>
+          <Card style={styles.card}>
+            <Text style={styles.cardTitle}>Trabajadores Activos</Text>
+            <Text style={styles.cardData}>{datosEstadisticas.trabajadoresActivos}</Text>
+          </Card>
+          <Card style={styles.card}>
+            <Text style={styles.cardTitle}>Temperatura Promedio</Text>
+            <Text style={styles.cardData}>{datosEstadisticas.temperaturaPromedio}°C</Text>
+          </Card>
+        </View>
+
+        <Text style={styles.graficoTitulo}>Horas Trabajadas por Mes</Text>
+        <LineChart
+          data={dataGrafico}
+          width={screenWidth - 40}
+          height={220}
+          chartConfig={{
+            backgroundColor: '#1cc910',
+            backgroundGradientFrom: '#0e1a2b',
+            backgroundGradientTo: '#0e1a2b',
+            decimalPlaces: 2,
+            color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+            labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+            style: {
+              borderRadius: 16,
+            },
+            propsForDots: {
+              r: '6',
+              strokeWidth: '2',
+              stroke: '#ffa726',
+            },
+          }}
+          bezier
+          style={{
+            marginVertical: 8,
             borderRadius: 16,
-          },
-          propsForDots: {
-            r: '6',
-            strokeWidth: '2',
-            stroke: '#ffa726',
-          },
-        }}
-        bezier
-        style={{
-          marginVertical: 8,
-          borderRadius: 16,
-        }}
-      />
-    </ScrollView>
+          }}
+        />
+      </ScrollView>
+    </View>
   );
 };
 
@@ -82,14 +85,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#422E13', // Fondo marrón oscuro
+    backgroundColor: '#422E13',
   },
   titulo: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
     textAlign: 'center',
-    color: '#DBB95F', // Amarillo claro para el título
+    color: '#DBB95F',
   },
   cardContainer: {
     flexDirection: 'row',
@@ -100,7 +103,7 @@ const styles = StyleSheet.create({
   card: {
     width: '48%',
     marginBottom: 10,
-    backgroundColor: '#7F5F16', // Marrón claro
+    backgroundColor: '#7F5F16',
     padding: 15,
     borderRadius: 10,
     shadowColor: '#000',
@@ -113,20 +116,19 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 5,
-    color: '#FFFFFF', // Blanco para los títulos de las tarjetas
+    color: '#FFFFFF',
   },
   cardData: {
     fontSize: 18,
-    color: '#DBB95F', // Amarillo claro para los datos
+    color: '#DBB95F',
   },
   graficoTitulo: {
     fontSize: 18,
     fontWeight: 'bold',
     marginVertical: 20,
     textAlign: 'center',
-    color: '#DBB95F', // Amarillo claro para el título del gráfico
+    color: '#DBB95F',
   },
 });
-
 
 export default EstadisticasScreen;
