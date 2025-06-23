@@ -8,7 +8,13 @@ import { DrawerContentComponentProps } from '@react-navigation/drawer';
 export default function DrawerContent({ navigation }: DrawerContentComponentProps) {
   const context = useContext(AuthContext);
 
-  if (!context) throw new Error('AuthContext is required');
+  if (!context) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.text}>Cargando menú...</Text>
+      </View>
+    );
+  }
 
   const { setIsAuthenticated } = context;
 

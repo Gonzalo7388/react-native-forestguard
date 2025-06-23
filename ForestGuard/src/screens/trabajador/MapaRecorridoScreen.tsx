@@ -1,32 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Dimensions, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons'; // For icons
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import MapView, { Polyline, Marker } from 'react-native-maps'; // Import MapView and Polyline
-import * as Location from 'expo-location'; // For location access
+import MapView, { Polyline, Marker } from 'react-native-maps';
+import * as Location from 'expo-location';
+import { useNavigation } from '@react-navigation/native';
 
 const screenWidth = Dimensions.get('window').width;
 
 const MapaRecorridoScreen = () => {
+  const navigation = useNavigation();
   const [selectedDate, setSelectedDate] = useState('April 20, 2025');
   const [timeRange, setTimeRange] = useState({ start: '09:00 AM', end: '05:00 PM' });
-  const [location, setLocation] = useState<Location.LocationObject | null>(null); // State for current location
+  const [location, setLocation] = useState<Location.LocationObject | null>(null);
 
-  // Placeholder function for date selection
   const handleSelectDate = () => {
     console.log('Select Date clicked');
-    // In a real app, this would open a date picker
   };
 
-  // Placeholder function for slider value change
-  const handleSliderChange = (value) => {
+  const handleSliderChange = (value: number) => {
     console.log('Slider value changed:', value);
-    // This would update timeRange based on slider value in a real implementation
   };
 
-  // Dummy coordinates for the route path
   const routeCoordinates = [
-    { latitude: -12.046374, longitude: -77.042793 }, // Lima center (example start)
+    { latitude: -12.046374, longitude: -77.042793 },
     { latitude: -12.050000, longitude: -77.045000 },
     { latitude: -12.053000, longitude: -77.047000 },
     { latitude: -12.055000, longitude: -77.050000 },
@@ -35,10 +32,9 @@ const MapaRecorridoScreen = () => {
     { latitude: -12.062000, longitude: -77.058000 },
     { latitude: -12.065000, longitude: -77.060000 },
     { latitude: -12.068000, longitude: -77.062000 },
-    { latitude: -12.070000, longitude: -77.065000 }, // Example end point
+    { latitude: -12.070000, longitude: -77.065000 },
   ];
 
-  // Effect to get current location
   useEffect(() => {
     (async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
@@ -65,9 +61,15 @@ const MapaRecorridoScreen = () => {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Icon name="arrow-left" size={24} color="#000000" style={styles.headerIcon} />
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Icon name="arrow-left" size={24} color="#000000" style={styles.headerIcon} />
+        </TouchableOpacity>
+
         <Text style={styles.headerTitle}>Worker Path History</Text>
-        <Icon name="dots-vertical" size={24} color="#000000" style={styles.headerIcon} />
+
+        <TouchableOpacity onPress={() => console.log('Opciones')}>
+          <Icon name="dots-vertical" size={24} color="#000000" style={styles.headerIcon} />
+        </TouchableOpacity>
       </View>
 
       {/* Date Selector */}
@@ -79,7 +81,7 @@ const MapaRecorridoScreen = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Real Map View */}
+      {/* Map */}
       <View style={styles.mapContainer}>
         <MapView
           style={styles.map}
@@ -94,54 +96,51 @@ const MapaRecorridoScreen = () => {
           zoomEnabled={true}
           scrollEnabled={true}
         >
-          {/* Draw the route path */}
           <Polyline
             coordinates={routeCoordinates}
             strokeWidth={4}
-            strokeColor="#7ED321" // Lime green for the route
+            strokeColor="#7ED321"
             lineCap="round"
             lineJoin="round"
           />
-          {/* Optionally add markers for start and end points of the route */}
           {routeCoordinates.length > 0 && (
             <>
               <Marker
                 coordinate={routeCoordinates[0]}
                 title="Inicio del Recorrido"
-                pinColor="#000000" // Black pin for start
+                pinColor="#000000"
               />
               <Marker
                 coordinate={routeCoordinates[routeCoordinates.length - 1]}
                 title="Fin del Recorrido"
-                pinColor="#7ED321" // Lime green pin for end
+                pinColor="#7ED321"
               />
             </>
           )}
         </MapView>
-        {/* Location icon on the map - kept for consistency with mockup, could be redundant with showsUserLocation */}
+
         <View style={styles.mapLocationIcon}>
           <Icon name="map-marker" size={30} color="#000000" />
         </View>
       </View>
 
-      {/* Time Slider */}
+      {/* Time Range Slider (simulada) */}
       <View style={styles.timeSliderContainer}>
         <Text style={styles.timeText}>{timeRange.start}</Text>
-        {/* Simple visual representation of the slider thumb */}
         <View style={styles.sliderLine}>
           <View style={styles.sliderThumb} />
         </View>
         <Text style={styles.timeText}>{timeRange.end}</Text>
       </View>
 
-      {/* Statistic Cards */}
+      {/* Estadísticas */}
       <View style={styles.cardWrapper}>
         <View style={styles.statisticCard}>
           <View>
             <Text style={styles.cardTitle}>Total Distance</Text>
             <Text style={styles.cardValue}>12.5 km</Text>
           </View>
-          <Icon name="share-variant" size={24} color="#000000" /> {/* Share icon */}
+          <Icon name="share-variant" size={24} color="#000000" />
         </View>
 
         <View style={styles.statisticCard}>
@@ -149,104 +148,62 @@ const MapaRecorridoScreen = () => {
             <Text style={styles.cardTitle}>Active Time</Text>
             <Text style={styles.cardValue}>7h 30m</Text>
           </View>
-          <Icon name="clock-outline" size={24} color="#000000" /> {/* Clock icon */}
+          <Icon name="clock-outline" size={24} color="#000000" />
         </View>
       </View>
-
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F5F5F5', // Light grey background
-  },
-  loaderContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5F5F5',
-  },
-  loadingText: {
-    marginTop: 10,
-    fontSize: 16,
-    color: '#000000',
-  },
+  container: { flex: 1, backgroundColor: '#F5F5F5' },
+  loaderContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#F5F5F5' },
+  loadingText: { marginTop: 10, fontSize: 16, color: '#000' },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingVertical: 15,
-    backgroundColor: '#FFFFFF', // White header background
+    backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0', // Light grey border
+    borderBottomColor: '#E0E0E0',
   },
-  headerIcon: {
-    padding: 5,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#000000', // Black text
-  },
+  headerIcon: { padding: 5 },
+  headerTitle: { fontSize: 18, fontWeight: 'bold', color: '#000000' },
   dateSelector: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 15,
-    backgroundColor: '#FFFFFF', // White background
+    backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
     borderBottomColor: '#E0E0E0',
   },
-  dateText: {
-    fontSize: 16,
-    color: '#000000', // Black text
-  },
+  dateText: { fontSize: 16, color: '#000000' },
   dateButton: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 8,
     borderRadius: 5,
-    backgroundColor: '#E0E0E0', // Light grey button background
+    backgroundColor: '#E0E0E0',
   },
-  dateButtonText: {
-    marginLeft: 5,
-    fontSize: 14,
-    color: '#000000', // Black text
-  },
+  dateButtonText: { marginLeft: 5, fontSize: 14, color: '#000000' },
   mapContainer: {
     flex: 1,
     margin: 20,
     borderRadius: 10,
-    overflow: 'hidden', // Hide overflow for rounded corners
-    borderWidth: 1, // Add a border to the map container
-    borderColor: '#E0E0E0', // Light grey border
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
   },
-  map: {
-    ...StyleSheet.absoluteFillObject, // Make map fill its container
-  },
-  mapPlaceholderText: { // No longer used but keeping for reference if needed
-    fontSize: 16,
-    color: '#666666', // Dark grey placeholder text
-  },
-  routePathPlaceholder: { // No longer used as Polyline is used
-    position: 'absolute',
-    top: '30%',
-    left: '10%',
-    width: '80%',
-    height: 3,
-    backgroundColor: '#7ED321', // Lime green for the route path
-    borderRadius: 2,
-    transform: [{ rotate: '5deg' }], // Slight angle for visual interest
-  },
+  map: { ...StyleSheet.absoluteFillObject },
   mapLocationIcon: {
     position: 'absolute',
     bottom: 15,
     right: 15,
-    backgroundColor: '#FFFFFF', // White background for the icon
+    backgroundColor: '#FFFFFF',
     borderRadius: 20,
     padding: 5,
     shadowColor: '#000',
@@ -254,7 +211,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 5,
-    zIndex: 1, // Ensure icon is above the map
+    zIndex: 1,
   },
   timeSliderContainer: {
     flexDirection: 'row',
@@ -263,14 +220,11 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginBottom: 20,
   },
-  timeText: {
-    fontSize: 14,
-    color: '#000000', // Black time text
-  },
+  timeText: { fontSize: 14, color: '#000000' },
   sliderLine: {
     flex: 1,
     height: 4,
-    backgroundColor: '#E0E0E0', // Light grey line
+    backgroundColor: '#E0E0E0',
     borderRadius: 2,
     marginHorizontal: 10,
     justifyContent: 'center',
@@ -279,19 +233,16 @@ const styles = StyleSheet.create({
     width: 16,
     height: 16,
     borderRadius: 8,
-    backgroundColor: '#7ED321', // Lime green thumb
+    backgroundColor: '#7ED321',
     borderWidth: 2,
-    borderColor: '#FFFFFF', // White border for the thumb
+    borderColor: '#FFFFFF',
   },
-  cardWrapper: {
-    paddingHorizontal: 20,
-    marginBottom: 20,
-  },
+  cardWrapper: { paddingHorizontal: 20, marginBottom: 20 },
   statisticCard: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF', // White card background
+    backgroundColor: '#FFFFFF',
     borderRadius: 10,
     padding: 15,
     marginBottom: 10,
@@ -301,28 +252,8 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
-  cardTitle: {
-    fontSize: 16,
-    color: '#666666', // Dark grey title
-    marginBottom: 5,
-  },
-  cardValue: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#000000', // Black value
-  },
-  bottomNavPlaceholder: {
-    height: 70, // Approximate height for bottom nav
-    backgroundColor: '#FFFFFF',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderTopWidth: 1,
-    borderTopColor: '#E0E0E0',
-  },
-  bottomNavText: {
-    color: '#666666',
-    fontSize: 12,
-  },
+  cardTitle: { fontSize: 16, color: '#666666', marginBottom: 5 },
+  cardValue: { fontSize: 20, fontWeight: 'bold', color: '#000000' },
 });
 
 export default MapaRecorridoScreen;
