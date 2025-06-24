@@ -1,8 +1,16 @@
-import React from 'react';
+import React, { createContext, useContext } from 'react';
 
-export type AuthContextType = {
+type AuthContextType = {
   isAuthenticated: boolean;
-  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsAuthenticated: (auth: boolean) => void;
 };
 
-export const AuthContext = React.createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const useAuthContext = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuthContext debe usarse dentro de AuthContext.Provider');
+  }
+  return context;
+};

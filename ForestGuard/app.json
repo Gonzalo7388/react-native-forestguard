@@ -2,6 +2,7 @@
   "expo": {
     "name": "ForestGuard",
     "slug": "ForestGuard",
+    "scheme": "forestguard",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -30,7 +31,8 @@
     },
     "plugins": [
       "expo-asset",
-      "expo-localization"
+      "expo-localization",
+      "react-native-auth0"
     ]
   }
 }

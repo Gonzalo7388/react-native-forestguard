@@ -9,19 +9,15 @@ const Stack = createNativeStackNavigator();
 const RootNavigator = () => {
   const auth = useContext(AuthContext);
 
-  if (!auth || typeof auth.setIsAuthenticated !== 'function') {
-    return null; // También podrías usar un <LoadingScreen />
+  // En caso el contexto no esté listo
+  if (!auth) {
+    return null; // Se puede reemplazar por una pantalla de carga
   }
 
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       {!auth.isAuthenticated ? (
-        <Stack.Screen
-          name="Login"
-          children={(props) => (
-            <LoginScreen {...props} setIsAuthenticated={auth.setIsAuthenticated} />
-          )}
-        />
+        <Stack.Screen name="Login" component={LoginScreen} />
       ) : (
         <Stack.Screen name="Admin" component={AdminNavigator} />
       )}
@@ -30,3 +26,4 @@ const RootNavigator = () => {
 };
 
 export default RootNavigator;
+

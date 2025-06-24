@@ -9,6 +9,9 @@ import { ErrorBoundary } from 'react-error-boundary';
 import RootNavigator from './src/navigation/RootNavigator';
 import { AuthContext } from './src/contexts/AuthContext';
 
+import { Auth0Provider } from 'react-native-auth0';
+import auth0Config from './src/config/authConfig';
+
 function ErrorFallback({ error }: { error: Error }) {
   return (
     <View style={styles.errorContainer}>
@@ -37,12 +40,14 @@ export default function App() {
 
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
-      <AuthContext.Provider value={{ isAuthenticated, setIsAuthenticated }}>
-        <NavigationContainer>
-          <StatusBar style="light" />
-          <RootNavigator />
-        </NavigationContainer>
-      </AuthContext.Provider>
+      <Auth0Provider domain={auth0Config.domain} clientId={auth0Config.clientId}>
+        <AuthContext.Provider value={{ isAuthenticated, setIsAuthenticated }}>
+          <NavigationContainer>
+            <StatusBar style="light" />
+            <RootNavigator />
+          </NavigationContainer>
+        </AuthContext.Provider>
+      </Auth0Provider>
     </ErrorBoundary>
   );
 }

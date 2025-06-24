@@ -31,6 +31,10 @@ Para correr el proyecto, usa el siguiente comando:
 
 Esto iniciará el servidor y te permitirá visualizar la aplicación en tu dispositivo móvil o en un emulador.
 
+#LOGIN CON EXPO
+Saber si has iniciado sesión: npx expo whoami
+iniciar sesión: npx expo login
+
 ## Dependencias
 
 * `expo-location`: Para obtener la ubicación actual del dispositivo.

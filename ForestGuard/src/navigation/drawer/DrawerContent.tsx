@@ -2,11 +2,13 @@
 import React, { useContext } from 'react';
 import { View, Text, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import { DrawerContentScrollView } from '@react-navigation/drawer';
-import { AuthContext } from '../../contexts/AuthContext';
 import { DrawerContentComponentProps } from '@react-navigation/drawer';
+import { AuthContext } from '../../contexts/AuthContext';
+import { useAuth0 } from 'react-native-auth0';
 
 export default function DrawerContent({ navigation }: DrawerContentComponentProps) {
   const context = useContext(AuthContext);
+  const { clearSession } = useAuth0();
 
   if (!context) {
     return (
@@ -18,10 +20,22 @@ export default function DrawerContent({ navigation }: DrawerContentComponentProp
 
   const { setIsAuthenticated } = context;
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     Alert.alert('Cerrar sesión', '¿Seguro que deseas salir?', [
       { text: 'Cancelar', style: 'cancel' },
-      { text: 'Cerrar sesión', style: 'destructive', onPress: () => setIsAuthenticated(false) },
+      {
+        text: 'Cerrar sesión',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await clearSession();
+            setIsAuthenticated(false);
+          } catch (error) {
+            console.error('Error al cerrar sesión:', error);
+            Alert.alert('Error', 'No se pudo cerrar sesión correctamente');
+          }
+        },
+      },
     ]);
   };
 
@@ -57,7 +71,6 @@ export default function DrawerContent({ navigation }: DrawerContentComponentProp
         <Text style={[styles.text, { color: 'red' }]}>Cerrar sesión</Text>
       </TouchableOpacity>
     </DrawerContentScrollView>
-
   );
 }
 
