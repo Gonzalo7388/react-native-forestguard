@@ -30,6 +30,8 @@ export default function App() {
     require('./assets/adaptive-icon.png'),
   ]);
 
+
+
   if (!assetsLoaded) {
     return (
       <View style={styles.loadingContainer}>

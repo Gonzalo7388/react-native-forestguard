@@ -1,13 +1,7 @@
 import * as AuthSession from 'expo-auth-session';
 
-const redirectUri = AuthSession.makeRedirectUri({
-  useProxy: true, // esto fuerza que se use el proxy de Expo
-}as any);
-
-const auth0Config = {
-  domain: 'dev-4mouz2fm57r73pyi.us.auth0.com',
-  clientId: 'kAAqdg5RnwDZw6SlTpcG6pBIXkDnIvhfD',
-  redirectUri, // importante: este debe ser con proxy si usas Expo Go
+export default {
+  domain: 'dev-jiptsf37qhfw6idu.us.auth0.com',
+  clientId: '7SahSCvApgmO6Glr78Y60i8HHJNu7qIK',
+  redirectUri: AuthSession.makeRedirectUri(),
 };
-
-export default auth0Config;

@@ -27,8 +27,7 @@ const LoginScreen = () => {
   const handleLogin = async () => {
     setLoading(true);
     try {
-      console.log('🟡 Iniciando proceso de login...');
-      console.log('🔵 redirectUri:', redirectUri);
+
 
       const authRequest = new AuthSession.AuthRequest({
         clientId: auth0Config.clientId,
