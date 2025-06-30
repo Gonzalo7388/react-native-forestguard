@@ -53,10 +53,8 @@ const CrearProyectoScreen = () => {
 
 
             Alert.alert('Proyecto creado', 'Redirigiendo...');
-            navigation.reset({
-                index: 0,
-                routes: [{ name: 'Admin' }],
-            });
+            navigation.navigate('Admin');
+
         } catch (error) {
             console.error('Error creando proyecto:', error);
             Alert.alert('Error', 'No se pudo crear el proyecto');
