@@ -24,6 +24,7 @@
     "expo-location": "~18.1.5",
     "expo-random": "^14.0.1",
     "expo-status-bar": "~2.2.3",
+    "firebase": "^11.9.1",
     "i18n-js": "^4.5.1",
     "react": "19.0.0",
     "react-dom": "19.0.0",

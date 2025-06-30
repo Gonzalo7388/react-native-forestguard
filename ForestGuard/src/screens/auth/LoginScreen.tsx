@@ -19,27 +19,23 @@ const discovery = {
 };
 
 const LoginScreen = () => {
-  const { setIsAuthenticated } = useAuthContext();
   const [loading, setLoading] = useState(false);
 
   const redirectUri = auth0Config.redirectUri;
 
+  const { setIsAuthenticated, setUser } = useAuthContext();
+
   const handleLogin = async () => {
     setLoading(true);
     try {
-
-
       const authRequest = new AuthSession.AuthRequest({
         clientId: auth0Config.clientId,
         redirectUri,
         scopes: ['openid', 'profile', 'email'],
         responseType: AuthSession.ResponseType.Code,
-        // extraParams: {
-        //   audience: `https://${auth0Config.domain}/userinfo`, 
-        // },
       });
 
-      await authRequest.makeAuthUrlAsync(discovery); // importante para inicializar internamente
+      await authRequest.makeAuthUrlAsync(discovery);
       const result = await authRequest.promptAsync(discovery);
 
       if (result.type !== 'success') {
@@ -63,13 +59,38 @@ const LoginScreen = () => {
 
       console.log('✅ Token recibido:', tokenResponse);
 
-      if (!tokenResponse.accessToken) {
+      if (!tokenResponse.idToken) {
         Alert.alert('Error', 'No se pudo obtener el token de acceso');
         return;
       }
 
-      Alert.alert('Login exitoso', 'Token recibido correctamente');
+      // Decodificar el idToken para obtener info del usuario:
+      const base64Url = tokenResponse.idToken.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split('')
+          .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .join('')
+      );
+      const userInfo = JSON.parse(jsonPayload);
+
+      console.log('✅ Usuario decodificado:', userInfo);
+
+      const sanitizedId = userInfo.sub.replace(/[^\w.-]/g, '_');
+
+      const userObject = {
+        id: sanitizedId,
+        name: userInfo.name ?? "",
+        email: userInfo.email ?? "",
+        avatarUrl: userInfo.picture ?? "",
+      };
+
+      setUser(userObject);
       setIsAuthenticated(true);
+
+
+      Alert.alert('Login exitoso', `Bienvenido, ${userInfo.name || userInfo.email}`);
     } catch (error) {
       console.error('❌ Error durante login:', error);
       Alert.alert('Error', 'No se pudo iniciar sesión');
@@ -77,6 +98,7 @@ const LoginScreen = () => {
       setLoading(false);
     }
   };
+
 
   return (
     <View style={styles.container}>

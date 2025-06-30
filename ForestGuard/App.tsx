@@ -12,6 +12,9 @@ import { AuthContext } from './src/contexts/AuthContext';
 import { Auth0Provider } from 'react-native-auth0';
 import auth0Config from './src/config/authConfig';
 
+import { UserType } from './src/types/user';
+
+
 function ErrorFallback({ error }: { error: Error }) {
   return (
     <View style={styles.errorContainer}>
@@ -23,14 +26,14 @@ function ErrorFallback({ error }: { error: Error }) {
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState<UserType | null>(null);
+
 
   const [assetsLoaded] = useAssets([
     require('./assets/icon.png'),
     require('./assets/splash-icon.png'),
     require('./assets/adaptive-icon.png'),
   ]);
-
-
 
   if (!assetsLoaded) {
     return (
@@ -43,7 +46,7 @@ export default function App() {
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
       <Auth0Provider domain={auth0Config.domain} clientId={auth0Config.clientId}>
-        <AuthContext.Provider value={{ isAuthenticated, setIsAuthenticated }}>
+        <AuthContext.Provider value={{ isAuthenticated, setIsAuthenticated, user, setUser }}>
           <NavigationContainer>
             <StatusBar style="light" />
             <RootNavigator />
