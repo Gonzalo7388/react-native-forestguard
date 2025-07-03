@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { View, Text, StyleSheet, ScrollView, Dimensions } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 import { Card } from 'react-native-paper'; // Assuming Card component is from react-native-paper
@@ -7,6 +7,11 @@ import Header from '../../components/Header'; // Header component is assumed to 
 const screenWidth = Dimensions.get('window').width;
 
 const EstadisticasScreen = () => {
+  
+  useEffect(() => {
+    throw new Error('⚠️ Error de prueba para verificar Sentry');
+  }, []);
+  
   // Sample statistics data
   const datosEstadisticas = {
     horasTrabajadas: 1234,

@@ -20,19 +20,29 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.fabras23.ForestGuard"
     },
     "web": {
       "favicon": "./assets/favicon.png",
       "bundler": "metro"
     },
     "extra": {
-      "forceUnversioned": true
+      "forceUnversioned": true,
+      "eas": {
+        "projectId": "ca19e6af-0f30-4315-be6c-4ba6fc757a18"
+      }
     },
     "plugins": [
       "expo-asset",
       "expo-localization",
-      "react-native-auth0"
+      [
+        "react-native-auth0",
+        {
+          "domain": "dev-4mouz2fm57r73pyi.us.auth0.com",
+          "scheme": "forestguard"
+        }
+      ]
     ]
   }
 }

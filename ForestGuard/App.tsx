@@ -6,6 +6,8 @@ import { StyleSheet, View, ActivityIndicator, Text } from 'react-native';
 import { useAssets } from 'expo-asset';
 import { ErrorBoundary } from 'react-error-boundary';
 
+import * as Sentry from 'sentry-expo';
+
 import RootNavigator from './src/navigation/RootNavigator';
 import { AuthContext } from './src/contexts/AuthContext';
 
@@ -14,6 +16,14 @@ import auth0Config from './src/config/authConfig';
 
 import { UserType } from './src/types/user';
 
+// ✅ Configuración de Sentry (ANTES de renderizar nada)
+Sentry.init({
+  dsn: 'https://0b59bebff37c976274d288a2549dbb2e@o4509601859305472.ingest.de.sentry.io/4509601862123600',
+  enableInExpoDevelopment: true,
+  debug: true,
+  integrations: [],
+  tracesSampleRate: 1.0,
+});
 
 function ErrorFallback({ error }: { error: Error }) {
   return (
@@ -27,7 +37,6 @@ function ErrorFallback({ error }: { error: Error }) {
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<UserType | null>(null);
-
 
   const [assetsLoaded] = useAssets([
     require('./assets/icon.png'),
