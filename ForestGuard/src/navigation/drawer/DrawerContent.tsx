@@ -63,6 +63,10 @@ export default function DrawerContent({ navigation }: DrawerContentComponentProp
         <Text style={styles.text}>Resumen del Trabajador</Text>
       </TouchableOpacity>
 
+      <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('Proyectos')}>
+        <Text style={styles.text}>Proyectos</Text>
+      </TouchableOpacity>
+
       <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('Configuracion')}>
         <Text style={styles.text}>Configuración</Text>
       </TouchableOpacity>

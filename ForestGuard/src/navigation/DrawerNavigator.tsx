@@ -8,6 +8,8 @@ import ControlEquipamientoScreen from '../screens/trabajador/ControlEquipamiento
 import EvaluacionPostJornadaScreen from '../screens/trabajador/EvaluacionPostJornadaScreen';
 import ResumenTrabajadorScreen from '../screens/admin/ResumenTrabajadorScreen';
 import ConfiguracionScreen from '../screens/comunes/ConfiguracionScreen';
+import ProyectosScreen from '../screens/comunes/ProyectosScreen';
+import InviteWorkerScreen from '../screens/admin/InviteWorkerScreen';
 
 const Drawer = createDrawerNavigator();
 
@@ -23,7 +25,10 @@ const DrawerNavigator = () => {
       <Drawer.Screen name="ControlEquipamiento" component={ControlEquipamientoScreen} />
       <Drawer.Screen name="EvaluacionPostJornada" component={EvaluacionPostJornadaScreen} />
       <Drawer.Screen name="ResumenTrabajador" component={ResumenTrabajadorScreen} />
+      <Drawer.Screen name="Proyectos" component={ProyectosScreen} />
+      <Drawer.Screen name="InviteWorker" component={InviteWorkerScreen} />
       <Drawer.Screen name="Configuracion" component={ConfiguracionScreen} />
+
     </Drawer.Navigator>
   );
 };
