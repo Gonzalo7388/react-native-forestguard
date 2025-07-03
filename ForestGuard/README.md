@@ -55,3 +55,4 @@ El proyecto está dividido en varias pantallas principales:
 
 * Usar una barra de navegación con Tabs para mejorar la accesibilidad y organización de las pantallas principales como Mapa, Control y Estadísticas.
 * Considerar la integración de una base de datos en tiempo real para gestionar las ubicaciones y estados de los usuarios y equipos.
+*.
