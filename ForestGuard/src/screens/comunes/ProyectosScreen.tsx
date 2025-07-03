@@ -27,15 +27,26 @@ const ProyectosScreen = () => {
 
                 const [snapMiembros, snapAdmin] = await Promise.all([
                     getDocs(qMiembros),
-                    getDocs(qAdmin)
+                    getDocs(qAdmin),
                 ]);
 
-                const proyectosData = [
+                let proyectosData = [
                     ...snapMiembros.docs.map(doc => ({ id: doc.id, ...doc.data() })),
-                    ...snapAdmin.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+                    ...snapAdmin.docs.map(doc => ({ id: doc.id, ...doc.data() })),
                 ];
 
-                // Eliminar duplicados por id
+                // ✅ Si tiene proyectoId en su usuario, traer también ese proyecto
+                if (auth.user.proyectoId) {
+                    const proyectoDoc = await getDocs(
+                        query(proyectosRef, where('__name__', '==', auth.user.proyectoId))
+                    );
+
+                    proyectoDoc.forEach(doc => {
+                        proyectosData.push({ id: doc.id, ...doc.data() });
+                    });
+                }
+
+                // ✅ Eliminar duplicados por id
                 const uniqueProjects = proyectosData.filter(
                     (project, index, self) => index === self.findIndex(p => p.id === project.id)
                 );
@@ -51,6 +62,7 @@ const ProyectosScreen = () => {
 
         fetchProyectos();
     }, [auth]);
+
 
 
     const handleProyectoPress = (proyecto: DocumentData) => {
