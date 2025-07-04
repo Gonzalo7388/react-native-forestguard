@@ -1,102 +1,14 @@
 // src/hooks/useAuth.ts
 
-import { useEffect, useState } from 'react';
-import auth0 from '../services/auth0';
-import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
-import { app } from '../config/firebase';
+import { useContext } from 'react';
+import { AuthContext } from '../contexts/AuthContext';
 
 export const useAuth = () => {
-  const [user, setUser] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const context = useContext(AuthContext);
 
-  const login = async () => {
-    try {
-      setIsLoading(true);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
 
-      // 1️⃣ Login con Auth0
-      const credentials = await auth0.webAuth.authorize({
-        scope: 'openid profile email',
-        additionalParameters: {
-          prompt: 'login',
-        },
-      });
-
-      const userInfo = await auth0.auth.userInfo({ token: credentials.accessToken });
-      console.log("✅ Auth0 userInfo:", userInfo);
-
-      if (!userInfo.sub) {
-        console.error("❌ El campo 'sub' de Auth0 no está presente, no se puede continuar.");
-        return false;
-      }
-
-      const sanitizedId = userInfo.sub.replace(/[^\w.-]/g, '_');
-
-      // 2️⃣ Objeto base
-      const userObject: any = {
-        id: sanitizedId,
-        name: userInfo.name ?? "",
-        email: userInfo.email ?? "",
-        avatarUrl: userInfo.picture ?? "",
-      };
-
-      const db = getFirestore(app);
-      const userDocRef = doc(db, 'usuarios', sanitizedId);
-      const userSnap = await getDoc(userDocRef);
-
-      if (userSnap.exists()) {
-        const userData = userSnap.data();
-        console.log("✅ Usuario encontrado en Firestore:", userData);
-
-        userObject.estado = userData.estado ?? 'activo';
-        userObject.proyectos = userData.proyectos ?? {};
-
-      } else {
-        console.log("ℹ️ Usuario no existía en Firestore, creando con datos por defecto...");
-
-        await setDoc(userDocRef, {
-          id: sanitizedId,
-          email: userInfo.email ?? "",
-          name: userInfo.name ?? "",
-          avatarUrl: userInfo.picture ?? "",
-          estado: 'activo',
-          proyectos: {}, // inicial vacío
-          createdAt: new Date(),
-        });
-
-        userObject.estado = 'activo';
-        userObject.proyectos = {};
-      }
-
-      // 3️⃣ Verificar si tiene proyectos asociados
-      userObject.tieneProyectos = userObject.proyectos && Object.keys(userObject.proyectos).length > 0;
-
-      console.log('✅ DEBUG USER OBJECT:', userObject);
-
-      // 4️⃣ Actualizar el contexto
-      setUser(userObject);
-      return true;
-
-    } catch (err) {
-      console.error('❌ Login failed:', err);
-      return false;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const logout = async () => {
-    try {
-      await auth0.webAuth.clearSession();
-      setUser(null);
-    } catch (err) {
-      console.error('❌ Logout failed:', err);
-    }
-  };
-
-  return {
-    user,
-    isLoading,
-    login,
-    logout,
-  };
+  return context;
 };

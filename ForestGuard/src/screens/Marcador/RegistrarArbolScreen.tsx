@@ -15,7 +15,7 @@ const RegistrarArbolScreen = () => {
   const [loading, setLoading] = useState(false);
 
   const navigation = useNavigation();
-  const { user } = useAuth();
+  const { currentProject, user } = useAuth();
 
   const handleTakePhoto = async () => {
     const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
@@ -53,7 +53,7 @@ const RegistrarArbolScreen = () => {
         latitud: location.coords.latitude,
         longitud: location.coords.longitude,
         marcadorId: user?.id ?? null,
-        proyectoId: user?.proyectoId ?? null,
+        proyectoId: currentProject?.id ?? null,  // ✅ usar currentProject.id
         timestamp: new Date(),
       });
 
