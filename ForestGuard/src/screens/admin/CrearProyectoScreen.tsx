@@ -62,7 +62,7 @@ const CrearProyectoScreen = () => {
     };
 
     return (
-        <View style={styles.container}>
+        <View testID='crear-proyecto-screen' style={styles.container}>
             <Text style={styles.title}>Crear Nuevo Proyecto</Text>
             <TextInput
                 style={styles.input}

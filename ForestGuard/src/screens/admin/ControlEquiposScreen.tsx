@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'; // For icons like user, phone, map-marker
 import Header from '../../components/Header'; // Assuming Header component exists
 
+
 // Define the type for an Equipo (Equipment) object
 type Equipo = {
   id: string;
@@ -67,7 +68,7 @@ const ControlEquiposScreen = () => {
   );
 
   return (
-    <View style={styles.container}>
+    <View testID='control-equipos-screen' style={styles.container}>
       <Header title="Mapa" />
 
       {/* Search bar */}

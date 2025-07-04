@@ -48,9 +48,14 @@
     "preset": "react-native",
     "setupFilesAfterEnv": ["<rootDir>/jest.setup.js"],
     "transformIgnorePatterns": [
-      "node_modules/(?!(@react-native|react-native|react-native-chart-kit)/)"
+    "node_modules/(?!(react-native" 
+        , "|@react-native"
+        , "|react-native-vector-icons"
+        , "|react-native-chart-kit"
+        , "|@react-navigation"
+      , ")/)"
     ],
-    "moduleNameMapper": {
+    "moduleNameMapper": { 
       "\\.(jpg|jpeg|png|svg)$": "<rootDir>/__mocks__/fileMock.js"
     }
   },

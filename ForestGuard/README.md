@@ -35,6 +35,9 @@ Esto iniciará el servidor y te permitirá visualizar la aplicación en tu dispo
 Saber si has iniciado sesión: npx expo whoami
 iniciar sesión: npx expo login
 
+## PRUEBAS UNITARIAS
+* `npm test`: Para ejecutar las pruebas unitarias
+
 ## Dependencias
 
 * `expo-location`: Para obtener la ubicación actual del dispositivo.

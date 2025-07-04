@@ -16,6 +16,17 @@ jest.mock('expo', () => ({
   },
 }));
 
+jest.mock('firebase/app', () => ({
+  initializeApp: jest.fn(),
+}));
+jest.mock('firebase/firestore', () => ({
+  getFirestore: jest.fn(),
+  collection: jest.fn(),
+  addDoc: jest.fn(),
+  setDoc: jest.fn(),
+  doc: jest.fn(),
+}));
+
 jest.mock('react-native-chart-kit', () => ({
   LineChart: () => null,
 }));
