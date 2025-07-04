@@ -22,10 +22,8 @@ export default function App() {
     console.log('CAMBIANDO PROYECTO', { proyecto, role });
     setCurrentProject(proyecto);
     setCurrentRole(role);
-    if (role === 'marcador') {
-      navigate('MarcadorDrawerNavigator', { proyecto });
-    }
   };
+
 
   const [assetsLoaded] = useAssets([
     require('./assets/icon.png'),

@@ -80,10 +80,12 @@ const ProyectosScreen = () => {
         });
 
         if (proyecto.administradorId === auth?.user?.id) {
-            navigation.navigate('InviteWorker', { proyecto });
+            navigation.navigate('ProyectoInfo', { proyecto });
         } else {
             if (userRoleInProject === 'marcador') {
                 auth.cambiarProyecto(proyecto, 'marcador');
+                Alert.alert('Proyecto cambiado', `Ahora estás trabajando en: ${proyecto.nombre}`);
+
             } else {
                 Alert.alert('Próximamente', 'Pantalla de detalle aún no implementada.');
             }
