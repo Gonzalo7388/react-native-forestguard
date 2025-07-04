@@ -5,7 +5,6 @@ import auth0 from '../services/auth0';
 import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
 import { app } from '../config/firebase';
 
-
 export const useAuth = () => {
   const [user, setUser] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -18,12 +17,11 @@ export const useAuth = () => {
       const credentials = await auth0.webAuth.authorize({
         scope: 'openid profile email',
         additionalParameters: {
-          prompt: 'login', // <- Esto forzará la solicitud de credenciales en cada login
+          prompt: 'login',
         },
       });
 
       const userInfo = await auth0.auth.userInfo({ token: credentials.accessToken });
-
       console.log("✅ Auth0 userInfo:", userInfo);
 
       if (!userInfo.sub) {
@@ -33,7 +31,7 @@ export const useAuth = () => {
 
       const sanitizedId = userInfo.sub.replace(/[^\w.-]/g, '_');
 
-      // 2️⃣ Prepara objeto base
+      // 2️⃣ Objeto base
       const userObject: any = {
         id: sanitizedId,
         name: userInfo.name ?? "",
@@ -41,7 +39,6 @@ export const useAuth = () => {
         avatarUrl: userInfo.picture ?? "",
       };
 
-      // 3️⃣ Verificar si ya existe en Firestore y cargar rol/proyectoId
       const db = getFirestore(app);
       const userDocRef = doc(db, 'usuarios', sanitizedId);
       const userSnap = await getDoc(userDocRef);
@@ -50,27 +47,32 @@ export const useAuth = () => {
         const userData = userSnap.data();
         console.log("✅ Usuario encontrado en Firestore:", userData);
 
-        userObject.proyectoId = userData.proyectoId ?? null;
-        userObject.rol = userData.rol ?? 'trabajador';
         userObject.estado = userData.estado ?? 'activo';
+        userObject.proyectos = userData.proyectos ?? {};
+
       } else {
-        // 4️⃣ Si no existe, crearlo en Firestore con defaults
         console.log("ℹ️ Usuario no existía en Firestore, creando con datos por defecto...");
+
         await setDoc(userDocRef, {
+          id: sanitizedId,
           email: userInfo.email ?? "",
           name: userInfo.name ?? "",
           avatarUrl: userInfo.picture ?? "",
-          rol: 'trabajador',
           estado: 'activo',
-          proyectoId: null,
+          proyectos: {}, // inicial vacío
+          createdAt: new Date(),
         });
 
-        userObject.proyectoId = null;
-        userObject.rol = 'trabajador';
         userObject.estado = 'activo';
+        userObject.proyectos = {};
       }
 
-      // 5️⃣ Actualizar el contexto
+      // 3️⃣ Verificar si tiene proyectos asociados
+      userObject.tieneProyectos = userObject.proyectos && Object.keys(userObject.proyectos).length > 0;
+
+      console.log('✅ DEBUG USER OBJECT:', userObject);
+
+      // 4️⃣ Actualizar el contexto
       setUser(userObject);
       return true;
 

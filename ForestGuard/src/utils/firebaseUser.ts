@@ -1,4 +1,3 @@
-// src/utils/firebaseUser.ts
 import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
 import { app } from "../config/firebase";
 
@@ -21,8 +20,8 @@ export const ensureUserInFirestore = async (user: {
         name: user.name || "",
         email: user.email || "",
         avatarUrl: user.avatarUrl || "",
-        role: "usuario",
-        proyectoId: null,
+        estado: 'activo',
+        proyectos: {},     // ✅ inicializa correctamente
         createdAt: new Date(),
       });
       console.log("✅ Usuario creado en Firestore correctamente");

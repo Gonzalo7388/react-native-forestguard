@@ -1,30 +1,35 @@
+// src/navigation/OnboardingNavigator.tsx
+
 import React, { useEffect, useState, useContext } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { ActivityIndicator, View } from 'react-native';
-import { AuthContext } from '../contexts/AuthContext';
+import { useAuthContext } from '../contexts/AuthContext';
 import CrearProyectoScreen from '../screens/admin/CrearProyectoScreen';
 import AdminNavigator from './AdminNavigator';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import { app } from '../config/firebase';
 import { UserType } from '../types/user';
-import { useNavigation } from '@react-navigation/native';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
 
 export type OnboardingStackParamList = {
+  Loader: undefined;
   CrearProyecto: undefined;
   Admin: undefined;
 };
 
 const Stack = createNativeStackNavigator<OnboardingStackParamList>();
 
-const OnboardingNavigator = () => {
-  const auth = useContext(AuthContext);
-  const [loading, setLoading] = useState(true);
+const LoaderScreen = () => {
+  const auth = useAuthContext();
   const navigation = useNavigation();
-  
+
   useEffect(() => {
     const checkProject = async () => {
       if (!auth || !auth.user) {
-        setLoading(false);
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'CrearProyecto' as never }],
+        });
         return;
       }
 
@@ -38,27 +43,25 @@ const OnboardingNavigator = () => {
         if (userSnap.exists()) {
           const userData = userSnap.data() as UserType;
 
-          if (userData.proyectoId) {
-            // Actualizar el contexto si no tiene el proyecto aún
-            if (!auth.user.proyectoId) {
+          if (userData.proyectos && Object.keys(userData.proyectos).length > 0) {
+            // ✅ Actualizar en contexto local si aún no está
+            if (!auth.user.proyectos || Object.keys(auth.user.proyectos).length === 0) {
               auth.setUser({
                 ...auth.user,
-                proyectoId: userData.proyectoId,
+                proyectos: userData.proyectos,
               });
             }
-
-            // Redirigir a Admin
             navigation.reset({
               index: 0,
               routes: [{ name: 'Admin' as never }],
             });
           } else {
-            // Redirigir a CrearProyecto
             navigation.reset({
               index: 0,
               routes: [{ name: 'CrearProyecto' as never }],
             });
           }
+
         } else {
           navigation.reset({
             index: 0,
@@ -71,25 +74,23 @@ const OnboardingNavigator = () => {
           index: 0,
           routes: [{ name: 'CrearProyecto' as never }],
         });
-      } finally {
-        setLoading(false);
       }
     };
 
     checkProject();
-  }, [auth]);
+  }, [auth, navigation]);
 
-  if (loading) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#121212' }}>
-        <ActivityIndicator size="large" color="#e74c3c" />
-      </View>
-    );
-  }
+  return (
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#121212' }}>
+      <ActivityIndicator size="large" color="#e74c3c" />
+    </View>
+  );
+};
 
-  // Ambas pantallas están registradas permanentemente
+const OnboardingNavigator = () => {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="Loader" component={LoaderScreen} />
       <Stack.Screen name="Admin" component={AdminNavigator} />
       <Stack.Screen name="CrearProyecto" component={CrearProyectoScreen} />
     </Stack.Navigator>

@@ -12,8 +12,9 @@ export const createUserIfNotExists = async (user: UserType) => {
       name: user.name || '',
       email: user.email || '',
       avatarUrl: user.avatarUrl || '',
-      role: user.role || 'sin rol',
-      proyectoId: user.proyectoId || '',
+      estado: 'activo',
+      proyectos: {},      // ✅ inicializa correctamente
+      createdAt: new Date(),
     });
     console.log('✅ Usuario creado en Firestore');
   } else {

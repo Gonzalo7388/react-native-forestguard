@@ -5,8 +5,14 @@ export type AuthContextType = {
   isAuthenticated: boolean;
   setIsAuthenticated: (auth: boolean) => void;
   user: UserType | null;
-  setUser: Dispatch<SetStateAction<UserType | null>>; // ✅ CORRECTO
+  setUser: Dispatch<SetStateAction<UserType | null>>;
+  currentRole: string | null; // 'admin', 'marcador', etc.
+  setCurrentRole: Dispatch<SetStateAction<string | null>>;
+  currentProject: any | null; // Puedes tipar mejor según tu estructura de proyecto
+  setCurrentProject: Dispatch<SetStateAction<any | null>>;
+  cambiarProyecto: (proyecto: any, role: string) => void;
 };
+
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 

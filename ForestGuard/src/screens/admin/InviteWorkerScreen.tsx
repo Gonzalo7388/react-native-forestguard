@@ -53,8 +53,9 @@ const InviteWorkerScreen = () => {
             if (!querySnapshot.empty) {
                 const docRef = querySnapshot.docs[0].ref;
                 await setDoc(docRef, {
-                    proyectoId: proyecto?.id ?? null,
-                    rol: rol,
+                    proyectos: {
+                        [proyecto?.id]: rol,
+                    },
                     estado: "invitado",
                 }, { merge: true });
                 Alert.alert("Invitación actualizada", "El usuario ya existía y se actualizó correctamente.");
@@ -65,8 +66,9 @@ const InviteWorkerScreen = () => {
                     email: email,
                     name: "",
                     avatarUrl: "",
-                    rol: rol,
-                    proyectoId: proyecto?.id ?? null,
+                    proyectos: {
+                        [proyecto?.id]: rol,
+                    },
                     estado: "invitado",
                     fechaInvitacion: new Date(),
                     emailPendingInvitation: true,
@@ -84,6 +86,7 @@ const InviteWorkerScreen = () => {
             setLoading(false);
         }
     };
+
 
     return (
         <View style={styles.container}>

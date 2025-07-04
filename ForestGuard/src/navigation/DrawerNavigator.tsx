@@ -1,7 +1,10 @@
 import React from 'react';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import BottomTabNavigator from './BottomTabNavigator';
+import MarcadorNavigator from './MarcadorNavigator';
+
 import DrawerContent from './drawer/DrawerContent';
+
 import MapaRecorridoScreen from '../screens/trabajador/MapaRecorridoScreen';
 import AsistenciaScreen from '../screens/trabajador/AsistenciaScreen';
 import ControlEquipamientoScreen from '../screens/trabajador/ControlEquipamientoScreen';
@@ -20,6 +23,7 @@ const DrawerNavigator = () => {
       drawerContent={(props) => <DrawerContent {...props} />}
     >
       <Drawer.Screen name="Tabs" component={BottomTabNavigator} />
+      <Drawer.Screen name="MarcadorNavigator" component={MarcadorNavigator} />
       <Drawer.Screen name="MapaRecorrido" component={MapaRecorridoScreen} />
       <Drawer.Screen name="Asistencia" component={AsistenciaScreen} />
       <Drawer.Screen name="ControlEquipamiento" component={ControlEquipamientoScreen} />

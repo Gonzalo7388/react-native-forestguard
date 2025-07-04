@@ -20,6 +20,8 @@ const CrearProyectoScreen = () => {
         return null;
     }
 
+    const user = auth.user; // ✅ ahora TypeScript sabe que no es null
+
     const navigation = useNavigation<NativeStackNavigationProp<RootParamList>>();
 
     const handleCrearProyecto = async () => {
@@ -29,13 +31,7 @@ const CrearProyectoScreen = () => {
         }
 
         try {
-            console.log("👀 ID del administrador que se usará al crear el proyecto:", auth.user!.id);
-            console.log("👀 auth.user!: ", auth.user);
-            console.log("👀 auth.user!.id: ", auth.user!.id);
-            console.log("👀 typeof auth.user!.id: ", typeof auth.user!.id);
-
             const safeUserId = auth.user!.id.replace(/[^\w.-]/g, '_');
-
 
             const proyectoRef = await addDoc(collection(db, 'proyectos'), {
                 nombre: nombreProyecto,
@@ -45,21 +41,42 @@ const CrearProyectoScreen = () => {
             });
 
             await setDoc(doc(db, 'usuarios', safeUserId), {
-                ...auth.user,
                 id: safeUserId,
-                proyectoId: proyectoRef.id,
-                rol: 'administrador',
+                name: user.name ?? '',
+                email: user.email ?? '',
+                avatarUrl: user.avatarUrl ?? '',
+                proyectos: {
+                    ...(user.proyectos ?? {}),
+                    [proyectoRef.id]: 'administrador',
+                },
+
             }, { merge: true });
 
+            // ✅ Actualizar el contexto local
+            if (auth.setUser) {
+                auth.setUser({
+                    ...user,
+                    proyectos: {
+                        ...(user.proyectos ?? {}),
+                        [proyectoRef.id]: 'administrador',
+                    },
+                });
+            }
 
             Alert.alert('Proyecto creado', 'Redirigiendo...');
-            navigation.navigate('Admin');
+            // ✅ Usar reset
+            navigation.reset({
+                index: 0,
+                routes: [{ name: 'Admin' }],
+            });
 
         } catch (error) {
             console.error('Error creando proyecto:', error);
             Alert.alert('Error', 'No se pudo crear el proyecto');
         }
     };
+
+
 
     return (
         <View style={styles.container}>
@@ -74,7 +91,6 @@ const CrearProyectoScreen = () => {
         </View>
     );
 };
-
 
 const styles = StyleSheet.create({
     container: { flex: 1, justifyContent: 'center', padding: 20 },

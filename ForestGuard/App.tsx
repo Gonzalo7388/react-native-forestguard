@@ -1,33 +1,31 @@
-import 'react-native-gesture-handler';
+// App.tsx
 import React, { useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View, ActivityIndicator, Text } from 'react-native';
+import { View, ActivityIndicator, Text } from 'react-native';
 import { useAssets } from 'expo-asset';
 import { ErrorBoundary } from 'react-error-boundary';
-
 import RootNavigator from './src/navigation/RootNavigator';
 import { AuthContext } from './src/contexts/AuthContext';
-
 import { Auth0Provider } from 'react-native-auth0';
 import auth0Config from './src/config/authConfig';
-
 import { UserType } from './src/types/user';
-
-
-function ErrorFallback({ error }: { error: Error }) {
-  return (
-    <View style={styles.errorContainer}>
-      <Text style={styles.errorTitle}>¡Algo salió mal!</Text>
-      <Text style={styles.errorMessage}>{error.message}</Text>
-    </View>
-  );
-}
+import { navigationRef, navigate } from './src/navigation/NavigationService';
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<UserType | null>(null);
+  const [currentRole, setCurrentRole] = useState<string | null>(null);
+  const [currentProject, setCurrentProject] = useState<any | null>(null);
 
+  const cambiarProyecto = (proyecto: any, role: string) => {
+    console.log('CAMBIANDO PROYECTO', { proyecto, role });
+    setCurrentProject(proyecto);
+    setCurrentRole(role);
+    if (role === 'marcador') {
+      navigate('MarcadorNavigator', { proyecto });
+    }
+  };
 
   const [assetsLoaded] = useAssets([
     require('./assets/icon.png'),
@@ -37,17 +35,34 @@ export default function App() {
 
   if (!assetsLoaded) {
     return (
-      <View style={styles.loadingContainer}>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#121212' }}>
         <ActivityIndicator size="large" color="#e74c3c" />
       </View>
     );
   }
 
   return (
-    <ErrorBoundary FallbackComponent={ErrorFallback}>
+    <ErrorBoundary FallbackComponent={({ error }) => (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20, backgroundColor: '#2e2e2e' }}>
+        <Text style={{ fontSize: 20, color: 'red', marginBottom: 10 }}>¡Algo salió mal!</Text>
+        <Text style={{ fontSize: 16, color: '#fff', textAlign: 'center' }}>{error.message}</Text>
+      </View>
+    )}>
       <Auth0Provider domain={auth0Config.domain} clientId={auth0Config.clientId}>
-        <AuthContext.Provider value={{ isAuthenticated, setIsAuthenticated, user, setUser }}>
-          <NavigationContainer>
+        <AuthContext.Provider
+          value={{
+            isAuthenticated,
+            setIsAuthenticated,
+            user,
+            setUser,
+            currentRole,
+            setCurrentRole,
+            currentProject,
+            setCurrentProject,
+            cambiarProyecto,
+          }}
+        >
+          <NavigationContainer ref={navigationRef}>
             <StatusBar style="light" />
             <RootNavigator />
           </NavigationContainer>
@@ -56,29 +71,3 @@ export default function App() {
     </ErrorBoundary>
   );
 }
-
-const styles = StyleSheet.create({
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#121212',
-  },
-  errorContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-    backgroundColor: '#2e2e2e',
-  },
-  errorTitle: {
-    fontSize: 20,
-    color: 'red',
-    marginBottom: 10,
-  },
-  errorMessage: {
-    fontSize: 16,
-    color: '#fff',
-    textAlign: 'center',
-  },
-});

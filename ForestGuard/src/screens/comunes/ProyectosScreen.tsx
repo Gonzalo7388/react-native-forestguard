@@ -2,11 +2,11 @@ import React, { useEffect, useState, useContext } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import { getFirestore, collection, query, where, getDocs, DocumentData } from 'firebase/firestore';
 import { app } from '../../config/firebase';
-import { AuthContext } from '../../contexts/AuthContext';
 import { useNavigation } from '@react-navigation/native';
+import { useAuthContext } from '../../contexts/AuthContext';
 
 const ProyectosScreen = () => {
-    const auth = useContext(AuthContext);
+    const auth = useAuthContext();
     const [proyectos, setProyectos] = useState<DocumentData[]>([]);
     const [loading, setLoading] = useState(true);
     const navigation = useNavigation<any>();
@@ -21,32 +21,37 @@ const ProyectosScreen = () => {
             try {
                 const db = getFirestore(app);
                 const proyectosRef = collection(db, 'proyectos');
+                let proyectosData: DocumentData[] = [];
 
-                const qMiembros = query(proyectosRef, where('miembros', 'array-contains', auth.user.id));
-                const qAdmin = query(proyectosRef, where('administradorId', '==', auth.user.id));
+                const userProjectIds = auth.user.proyectos ? Object.keys(auth.user.proyectos) : [];
 
-                const [snapMiembros, snapAdmin] = await Promise.all([
-                    getDocs(qMiembros),
-                    getDocs(qAdmin),
-                ]);
+                if (userProjectIds.length > 0) {
+                    // Firestore permite máx 10 elementos en 'in', dividir si se requiere
+                    const batches = [];
+                    const batchSize = 10;
+                    for (let i = 0; i < userProjectIds.length; i += batchSize) {
+                        const batchIds = userProjectIds.slice(i, i + batchSize);
+                        const q = query(proyectosRef, where('__name__', 'in', batchIds));
+                        batches.push(getDocs(q));
+                    }
 
-                let proyectosData = [
-                    ...snapMiembros.docs.map(doc => ({ id: doc.id, ...doc.data() })),
-                    ...snapAdmin.docs.map(doc => ({ id: doc.id, ...doc.data() })),
-                ];
+                    const snapshots = await Promise.all(batches);
 
-                // ✅ Si tiene proyectoId en su usuario, traer también ese proyecto
-                if (auth.user.proyectoId) {
-                    const proyectoDoc = await getDocs(
-                        query(proyectosRef, where('__name__', '==', auth.user.proyectoId))
-                    );
-
-                    proyectoDoc.forEach(doc => {
-                        proyectosData.push({ id: doc.id, ...doc.data() });
+                    snapshots.forEach(snapshot => {
+                        snapshot.forEach(doc => {
+                            proyectosData.push({ id: doc.id, ...doc.data() });
+                        });
                     });
                 }
 
-                // ✅ Eliminar duplicados por id
+                // Si además deseas incluir proyectos donde es admin pero aún no esté en el mapa:
+                const qAdmin = query(proyectosRef, where('administradorId', '==', auth.user.id));
+                const snapAdmin = await getDocs(qAdmin);
+                snapAdmin.forEach(doc => {
+                    proyectosData.push({ id: doc.id, ...doc.data() });
+                });
+
+                // Eliminar duplicados por id
                 const uniqueProjects = proyectosData.filter(
                     (project, index, self) => index === self.findIndex(p => p.id === project.id)
                 );
@@ -66,14 +71,26 @@ const ProyectosScreen = () => {
 
 
     const handleProyectoPress = (proyecto: DocumentData) => {
+        const userRoleInProject = auth?.user?.proyectos?.[proyecto.id];
+
+        console.log('DEBUG CLICK', {
+            userRole: userRoleInProject ?? 'sin rol',
+            userProyectoId: auth?.user?.proyectoId ?? 'sin proyecto activo',
+            proyectoId: proyecto.id,
+        });
+
         if (proyecto.administradorId === auth?.user?.id) {
-            // ✅ Es administrador en este proyecto, ir a InviteWorkerScreen
             navigation.navigate('InviteWorker', { proyecto });
         } else {
-            // ✅ No es admin, mostrar vista de trabajador o detalle
-            navigation.navigate('DetalleProyectoTrabajador', { proyecto });
+            if (userRoleInProject === 'marcador') {
+                auth.cambiarProyecto(proyecto, 'marcador');
+            } else {
+                Alert.alert('Próximamente', 'Pantalla de detalle aún no implementada.');
+            }
         }
     };
+
+
 
 
     if (loading) {
@@ -90,15 +107,24 @@ const ProyectosScreen = () => {
             <FlatList
                 data={proyectos}
                 keyExtractor={(item) => item.id}
-                renderItem={({ item }) => (
-                    <TouchableOpacity
-                        style={styles.item}
-                        onPress={() => handleProyectoPress(item)}
-                    >
-                        <Text style={styles.projectName}>{item.nombre}</Text>
-                        <Text style={styles.projectDesc}>{item.descripcion ?? 'Sin descripción'}</Text>
-                    </TouchableOpacity>
-                )}
+                renderItem={({ item }) => {
+                    const userRoleInProject = auth?.user?.proyectos?.[item.id] ??
+                        (item.administradorId === auth?.user?.id ? 'administrador' : 'sin rol');
+
+                    return (
+                        <TouchableOpacity
+                            style={styles.item}
+                            onPress={() => handleProyectoPress(item)}
+                        >
+                            <Text style={styles.projectName}>{item.nombre}</Text>
+                            <Text style={styles.projectDesc}>{item.descripcion ?? 'Sin descripción'}</Text>
+                            <Text style={{ color: '#888', marginTop: 4 }}>
+                                Rol en este proyecto: {userRoleInProject}
+                            </Text>
+                        </TouchableOpacity>
+                    );
+                }}
+
                 ListEmptyComponent={<Text style={{ textAlign: 'center', marginTop: 20 }}>No tienes proyectos asociados.</Text>}
             />
         </View>
