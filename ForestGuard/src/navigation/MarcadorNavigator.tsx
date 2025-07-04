@@ -1,12 +1,10 @@
-// src/navigation/MarcadorNavigator.tsx
-
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
 import MapaMarcadorScreen from '../screens/Marcador/MapaMarcadorScreen';
 import RecibirAlertasScreen from '../screens/admin/RecibirAlertasScreen';
+import Header from '../components/Header'; // Asegúrate de importar tu Header
 
 const Tab = createBottomTabNavigator();
 
@@ -29,7 +27,7 @@ const MarcadorNavigator = () => {
           fontSize: 12,
           fontWeight: 'bold',
         },
-        headerShown: false,
+        header: () => <Header title={route.name === 'MapaMarcador' ? 'Mapa' : 'Alertas'} />,
         tabBarIcon: ({ color, size }) => {
           let iconName;
 

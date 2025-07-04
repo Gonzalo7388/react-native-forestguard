@@ -23,7 +23,7 @@ export default function App() {
     setCurrentProject(proyecto);
     setCurrentRole(role);
     if (role === 'marcador') {
-      navigate('MarcadorNavigator', { proyecto });
+      navigate('MarcadorDrawerNavigator', { proyecto });
     }
   };
 
