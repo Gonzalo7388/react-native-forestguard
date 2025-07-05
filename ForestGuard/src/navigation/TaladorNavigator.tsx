@@ -1,14 +1,16 @@
+// src/navigation/TaladorNavigator.tsx
+
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import MapaMarcadorScreen from '../screens/Marcador/MapaMarcadorScreen';
+import MapaTaladorScreen from '../screens/Talador/MapaTaladorScreen';
 import RecibirAlertasScreen from '../screens/admin/RecibirAlertasScreen';
-import Header from '../components/Header'; // Asegúrate de importar tu Header
+import Header from '../components/Header';
 
 const Tab = createBottomTabNavigator();
 
-const MarcadorNavigator = () => {
+const TaladorNavigator = () => {
   const insets = useSafeAreaInsets();
 
   return (
@@ -27,14 +29,20 @@ const MarcadorNavigator = () => {
           fontSize: 12,
           fontWeight: 'bold',
         },
-        header: () => <Header title={route.name === 'MapaMarcador' ? 'Mapa' : 'Alertas'} />,
+        header: () => (
+          <Header
+            title={route.name === 'MapaTalador' ? 'Mapa' : 'Alertas'}
+          />
+        ),
         tabBarIcon: ({ color, size }) => {
-          let iconName;
+          let iconName: string;
 
-          if (route.name === 'MapaMarcador') {
+          if (route.name === 'MapaTalador') {
             iconName = 'map-outline';
           } else if (route.name === 'Alertas') {
             iconName = 'bell-outline';
+          } else {
+            iconName = 'help-circle-outline'; // fallback
           }
 
           return <Icon name={iconName} size={size} color={color} />;
@@ -42,8 +50,8 @@ const MarcadorNavigator = () => {
       })}
     >
       <Tab.Screen
-        name="MapaMarcador"
-        component={MapaMarcadorScreen}
+        name="MapaTalador"
+        component={MapaTaladorScreen}
         options={{ title: 'Mapa' }}
       />
       <Tab.Screen
@@ -55,4 +63,4 @@ const MarcadorNavigator = () => {
   );
 };
 
-export default MarcadorNavigator;
+export default TaladorNavigator;

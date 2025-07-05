@@ -55,6 +55,7 @@ const RegistrarArbolScreen = () => {
         marcadorId: user?.id ?? null,
         proyectoId: currentProject?.id ?? null,  // ✅ usar currentProject.id
         timestamp: new Date(),
+        estado: 'en_pie',
       });
 
       Alert.alert('Registro exitoso', 'El árbol ha sido registrado correctamente.');

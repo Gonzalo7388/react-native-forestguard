@@ -112,7 +112,6 @@ const RecibirAlertasScreen = () => {
 
   return (
     <View style={styles.container}>
-            <Header title="Alertas" />
 
       {/* El header anterior y el simulado han sido eliminados */}
 

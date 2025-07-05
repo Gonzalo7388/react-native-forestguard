@@ -5,7 +5,7 @@ import { DrawerContentComponentProps } from '@react-navigation/drawer';
 import { AuthContext } from '../../contexts/AuthContext';
 import { useAuth0 } from 'react-native-auth0';
 
-export default function DrawerContentTrazador({ navigation }: DrawerContentComponentProps) {
+export default function DrawerContentTalador({ navigation }: DrawerContentComponentProps) {
   const context = useContext(AuthContext);
   const { clearSession } = useAuth0();
 
@@ -42,7 +42,7 @@ export default function DrawerContentTrazador({ navigation }: DrawerContentCompo
     <DrawerContentScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Menú</Text>
 
-      <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('TrazadorTabs')}>
+      <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('TaladorTabs')}>
         <Text style={styles.text}>Inicio</Text>
       </TouchableOpacity>
 

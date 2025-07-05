@@ -28,7 +28,6 @@ const EstadisticasScreen = () => {
   return (
     <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}> {/* White background for the main view */}
       {/* Header component */}
-      <Header title="Estadísticas" />
 
       <ScrollView style={styles.container}>
         <Text style={styles.titulo}>Estadísticas Generales</Text>

@@ -87,8 +87,6 @@ const MapaScreen = () => {
 
   return (
     <View style={styles.container}>
-      {/* Header component */}
-      <Header title="Mapa" />
 
       {/* Map component */}
       <MapView

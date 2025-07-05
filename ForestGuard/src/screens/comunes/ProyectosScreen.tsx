@@ -80,20 +80,31 @@ const ProyectosScreen = () => {
         });
 
         if (proyecto.administradorId === auth?.user?.id) {
+            // Es administrador del proyecto
             navigation.navigate('ProyectoInfo', { proyecto });
         } else {
+
             if (userRoleInProject === 'marcador') {
                 auth.cambiarProyecto(proyecto, 'marcador');
-                Alert.alert('Proyecto cambiado', `Ahora estás trabajando en: ${proyecto.nombre}`);
+                Alert.alert('Proyecto cambiado', `Ahora estás trabajando en: ${proyecto.nombre} como Marcador`);
             } else if (userRoleInProject === 'trazador') {
                 auth.cambiarProyecto(proyecto, 'trazador');
-                Alert.alert('Proyecto cambiado', `Ahora estás trabajando en: ${proyecto.nombre}`);
+                Alert.alert('Proyecto cambiado', `Ahora estás trabajando en: ${proyecto.nombre} como Trazador`);
+            } else if (userRoleInProject === 'talador') {
+                auth.cambiarProyecto(proyecto, 'talador');
+                Alert.alert('Proyecto cambiado', `Ahora estás trabajando en: ${proyecto.nombre} como Talador`);
+            } else if (userRoleInProject === 'auxiliar') {
+                auth.cambiarProyecto(proyecto, 'auxiliar');
+                Alert.alert('Proyecto cambiado', `Ahora estás trabajando en: ${proyecto.nombre} como Auxiliar`);
             } else {
-                Alert.alert('Próximamente', 'Tu rol en este proyecto aún no tiene funcionalidades implementadas.');
+                Alert.alert(
+                    'Sin acceso',
+                    'No tienes un rol asignado en este proyecto o aún no hay funcionalidades implementadas para tu rol.'
+                );
             }
-        }
-    };
+        };
 
+    }
 
 
 

@@ -1,21 +1,20 @@
-// src/screens/Marcador/MapaMarcadorScreen.tsx
+// src/screens/Talador/MapaTaladorScreen.tsx
 
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, ActivityIndicator, Alert } from 'react-native';
+import { View, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
-import FloatingActionButton from '../../components/FloatingActionButton';
-import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { getFirestore, collection, query, where, getDocs } from 'firebase/firestore';
 import { app } from '../../config/firebase';
 import { useAuth } from '../../hooks/useAuth';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-type MarcadorStackParamList = {
-  RegistrarArbol: undefined;
+type TaladorStackParamList = {
+  ConfirmarTalaArbol: { arbolId: string };
 };
 
-type NavigationProp = NativeStackNavigationProp<MarcadorStackParamList>;
+type NavigationProp = NativeStackNavigationProp<TaladorStackParamList>;
 
 type Arbol = {
   id: string;
@@ -26,62 +25,49 @@ type Arbol = {
   marcadorId: string;
   proyectoId: string;
   estado: string;
-
 };
 
-const MapaMarcadorScreen = () => {
+const MapaTaladorScreen = () => {
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
   const [arboles, setArboles] = useState<Arbol[]>([]);
   const [loading, setLoading] = useState(true);
+  const { user, currentProject } = useAuth();
   const navigation = useNavigation<NavigationProp>();
-  const { user } = useAuth();
-
-
-  const obtenerProyectoId = () => {
-    if (!user?.proyectos) return null;
-    const proyectos = user.proyectos;
-    // Extraer el primer proyecto donde el usuario sea marcador
-    const proyectoIdMarcador = Object.keys(proyectos).find(
-      key => proyectos[key] === 'marcador'
-    );
-    return proyectoIdMarcador ?? null;
-  };
 
   const obtenerUbicacion = async () => {
     try {
       const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
       setLocation(loc);
     } catch (error) {
-      console.error('Error al obtener la ubicación:', error);
+      console.error('Error al obtener ubicación:', error);
       Alert.alert('Error', 'No se pudo obtener la ubicación.');
     }
   };
 
   const cargarArboles = async () => {
-    const proyectoId = obtenerProyectoId();
-    if (!proyectoId) {
-      Alert.alert('Error', 'const obtenerProyectoId.');
+    if (!currentProject?.id) {
+      Alert.alert('Error', 'No tienes un proyecto seleccionado.');
       setLoading(false);
       return;
     }
     try {
       const db = getFirestore(app);
       const arbolesRef = collection(db, 'arboles');
-      const q = query(arbolesRef, where('proyectoId', '==', proyectoId));
+      const q = query(arbolesRef, where('proyectoId', '==', currentProject.id));
       const snapshot = await getDocs(q);
 
       const arbolesData: Arbol[] = [];
-      snapshot.forEach(doc => {
-        const data = doc.data();
+      snapshot.forEach(docSnap => {
+        const data = docSnap.data();
         arbolesData.push({
-          id: doc.id,
+          id: docSnap.id,
           latitud: data.latitud,
           longitud: data.longitud,
           especie: data.especie,
           descripcion: data.descripcion,
           marcadorId: data.marcadorId,
           proyectoId: data.proyectoId,
-          estado: data.estado ?? 'en_pie', // ✅ NUEVO
+          estado: data.estado ?? 'en_pie',
         });
       });
       setArboles(arbolesData);
@@ -131,7 +117,6 @@ const MapaMarcadorScreen = () => {
           longitudeDelta: 0.01,
         }}
         showsUserLocation
-        zoomEnabled
       >
         {arboles.map(arbol => (
           <Marker
@@ -139,32 +124,26 @@ const MapaMarcadorScreen = () => {
             coordinate={{ latitude: arbol.latitud, longitude: arbol.longitud }}
             title={arbol.especie}
             description={arbol.descripcion}
-            pinColor={
-              arbol.estado === 'talado'
-                ? '#888888' // gris
-                : (arbol.marcadorId === user?.id ? '#7ED321' : '#2e2e2e') // verde o gris oscuro
-            }
+            pinColor={arbol.estado === 'talado' ? '#808080' : '#7ED321'} // gris o verde
+            onPress={() => {
+              if (arbol.estado === 'en_pie') {
+                navigation.navigate('ConfirmarTalaArbol', { arbolId: arbol.id });
+              } else {
+                Alert.alert('Información', 'Este árbol ya está marcado como talado.');
+              }
+            }}
           />
         ))}
       </MapView>
-
-      <FloatingActionButton
-        iconName="camera"
-        onPress={() => navigation.navigate('RegistrarArbol')}
-      />
     </View>
   );
 };
 
-export default MapaMarcadorScreen;
+export default MapaTaladorScreen;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  map: {
-    flex: 1,
-  },
+  container: { flex: 1 },
+  map: { flex: 1 },
   loader: {
     flex: 1,
     justifyContent: 'center',

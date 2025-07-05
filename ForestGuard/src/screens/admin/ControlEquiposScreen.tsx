@@ -68,7 +68,6 @@ const ControlEquiposScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Header title="Mapa" />
 
       {/* Search bar */}
       <View style={styles.searchBarContainer}>
