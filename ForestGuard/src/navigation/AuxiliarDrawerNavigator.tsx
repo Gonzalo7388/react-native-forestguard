@@ -5,9 +5,9 @@ import AuxiliarNavigator from './AuxiliarNavigator';
 import DrawerContentAuxiliar from './drawer/DrawerContentAuxiliar';
 
 import MapaRecorridoScreen from '../screens/trabajador/MapaRecorridoScreen';
-import AsistenciaScreen from '../screens/trabajador/AsistenciaScreen';
-import ControlEquipamientoScreen from '../screens/trabajador/ControlEquipamientoScreen';
-import EvaluacionPostJornadaScreen from '../screens/trabajador/EvaluacionPostJornadaScreen';
+import AsistenciaScreen from '../screens/Auxiliar/AsistenciaScreen';
+import ControlEquipamientoScreen from '../screens/Auxiliar/ControlEquipamientoScreen';
+import EvaluacionPostJornadaScreen from '../screens/Auxiliar/EvaluacionPostJornadaScreen';
 import ResumenTrabajadorScreen from '../screens/admin/ResumenTrabajadorScreen';
 import ConfiguracionScreen from '../screens/comunes/ConfiguracionScreen';
 import ProyectosScreen from '../screens/comunes/ProyectosScreen';
