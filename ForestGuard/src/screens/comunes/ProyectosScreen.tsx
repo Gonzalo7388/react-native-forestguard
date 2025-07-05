@@ -85,12 +85,15 @@ const ProyectosScreen = () => {
             if (userRoleInProject === 'marcador') {
                 auth.cambiarProyecto(proyecto, 'marcador');
                 Alert.alert('Proyecto cambiado', `Ahora estás trabajando en: ${proyecto.nombre}`);
-
+            } else if (userRoleInProject === 'trazador') {
+                auth.cambiarProyecto(proyecto, 'trazador');
+                Alert.alert('Proyecto cambiado', `Ahora estás trabajando en: ${proyecto.nombre}`);
             } else {
-                Alert.alert('Próximamente', 'Pantalla de detalle aún no implementada.');
+                Alert.alert('Próximamente', 'Tu rol en este proyecto aún no tiene funcionalidades implementadas.');
             }
         }
     };
+
 
 
 

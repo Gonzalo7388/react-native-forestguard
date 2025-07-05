@@ -1,16 +1,25 @@
 import React from 'react';
-import { TouchableOpacity, StyleSheet, Text } from 'react-native';
+import { TouchableOpacity, StyleSheet, Text, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 type FloatingActionButtonProps = {
   onPress: () => void;
   iconName?: string;
   label?: string;
+  style?: ViewStyle; // ✅ Permitir estilo externo opcional
+  customStyle?: any; // Permitir estilos externos
+
 };
 
-const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({ onPress, iconName = 'add', label = '' }) => {
+const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
+  onPress,
+  iconName = 'add',
+  label = '',
+  style, // ✅ recibir
+  customStyle = {}
+}) => {
   return (
-    <TouchableOpacity style={styles.fab} onPress={onPress}>
+    <TouchableOpacity style={[styles.fab, style,customStyle]} onPress={onPress}>
       {iconName ? <Ionicons name={iconName as any} size={28} color="#fff" /> : null}
       {label ? <Text style={styles.label}>{label}</Text> : null}
     </TouchableOpacity>

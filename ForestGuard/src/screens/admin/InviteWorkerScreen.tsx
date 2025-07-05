@@ -6,7 +6,7 @@ import { app } from '../../config/firebase';
 import { AuthContext } from '../../contexts/AuthContext';
 import { RouteProp, useRoute } from '@react-navigation/native';
 
-const rolesDisponibles = ['talador', 'marcador', 'operador', 'auxiliar'];
+const rolesDisponibles = ['talador','trazador', 'marcador', 'operador', 'auxiliar'];
 
 const InviteWorkerScreen = () => {
     const route = useRoute<RouteProp<{ params: { proyecto: DocumentData } }, 'params'>>();
