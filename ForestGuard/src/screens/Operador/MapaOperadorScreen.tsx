@@ -1,5 +1,4 @@
-// src/screens/Operador/MapaOperadorScreen.tsx
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import {
     View,
     StyleSheet,
@@ -13,10 +12,11 @@ import MapView, { Marker, PROVIDER_GOOGLE, Polygon, LatLng } from 'react-native-
 import * as Location from 'expo-location';
 import { getFirestore, collection, query, where, getDocs } from 'firebase/firestore';
 import { app } from '../../config/firebase';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth'; // Make sure useAuth provides the user object
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { saveUserLocation } from '../../services/locationService'; // Import the service
 
 type OperadorStackParamList = {
     ConfirmarTransporteTroncos: { troncoIds: string[] };
@@ -40,7 +40,7 @@ const MapaOperadorScreen = () => {
     const [troncos, setTroncos] = useState<Tronco[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedTroncos, setSelectedTroncos] = useState<Set<string>>(new Set());
-    const { currentProject } = useAuth();
+    const { currentProject, user } = useAuth(); // Destructure user from useAuth
     const navigation = useNavigation<NavigationProp>();
 
     // Estados y refs para la funcionalidad de dibujo
@@ -48,18 +48,43 @@ const MapaOperadorScreen = () => {
     const [drawingCoordinates, setDrawingCoordinates] = useState<LatLng[]>([]);
     const mapRef = useRef<MapView>(null);
 
-    const obtenerUbicacion = async () => {
+    const obtenerUbicacion = useCallback(async () => {
+        console.log('DEBUG (Operador): Iniciando obtenerUbicacion...');
         try {
             const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
+            console.log('DEBUG (Operador): Ubicación obtenida:', loc.coords);
             setLocation(loc);
+
+            // --- INICIO DEL CAMBIO CLAVE ---
+            // Guardar la ubicación del usuario en Firestore
+            if (loc && user?.id && currentProject?.id) {
+                console.log('DEBUG (Operador): Llamando a saveUserLocation desde obtenerUbicacion.');
+                await saveUserLocation(
+                    user.id,
+                    currentProject.id,
+                    {
+                        latitude: loc.coords.latitude,
+                        longitude: loc.coords.longitude,
+                        timestamp: new Date(loc.timestamp) // Ensure timestamp is a Date object
+                    }
+                );
+            } else {
+                console.warn('DEBUG (Operador): No se guarda la ubicación porque loc es nulo o user.id/currentProject.id no existe.');
+            }
+            // --- FIN DEL CAMBIO CLAVE ---
+
         } catch (error) {
-            console.error('Error al obtener ubicación:', error);
+            console.error('ERROR (Operador) al obtener ubicación:', error);
             Alert.alert('Error', 'No se pudo obtener la ubicación.');
+        } finally {
+            console.log('DEBUG (Operador): obtenerUbicacion finalizada.');
         }
-    };
+    }, [user?.id, currentProject?.id]); // Add user.id and currentProject.id to dependencies
 
     const cargarTroncos = async () => {
+        console.log('DEBUG (Operador): Iniciando cargarTroncos...');
         if (!currentProject?.id) {
+            console.warn('cargarTroncos (Operador): No hay currentProject.id definido. No se cargarán troncos.');
             Alert.alert('Error', 'No tienes un proyecto seleccionado.');
             setLoading(false);
             return;
@@ -89,31 +114,76 @@ const MapaOperadorScreen = () => {
                 });
             });
             setTroncos(troncosData);
+            console.log(`DEBUG (Operador): Cargados ${troncosData.length} troncos.`);
         } catch (error) {
-            console.error('Error al cargar troncos:', error);
+            console.error('ERROR (Operador) al cargar troncos:', error);
             Alert.alert('Error', 'No se pudieron cargar los troncos.');
         } finally {
             setLoading(false);
+            console.log('DEBUG (Operador): cargarTroncos finalizada.');
         }
     };
 
     useEffect(() => {
-        const solicitarPermiso = async () => {
-            const { status } = await Location.requestForegroundPermissionsAsync();
-            if (status !== 'granted') {
-                Alert.alert('Permiso denegado', 'Se requieren permisos de ubicación.');
-                setLoading(false);
+        let interval: NodeJS.Timeout | undefined;
+
+        const initMap = async () => {
+            console.log('DEBUG (Operador): useEffect: Iniciando initMap.');
+            if (!user?.id || !currentProject?.id) {
+                console.log('DEBUG (Operador): useEffect: Esperando user.id o currentProject.id para iniciar la carga.');
+                setLoading(true);
                 return;
             }
-            await obtenerUbicacion();
+
+            try {
+                console.log('DEBUG (Operador): Solicitando permisos de ubicación...');
+                const { status } = await Location.requestForegroundPermissionsAsync();
+                if (status !== 'granted') {
+                    Alert.alert('Permiso denegado', 'Se requieren permisos de ubicación para usar el mapa.');
+                    setLoading(false);
+                    return;
+                }
+                console.log('DEBUG (Operador): Permisos de ubicación concedidos.');
+
+                console.log('DEBUG (Operador): Llamando a obtenerUbicacion inicial...');
+                await obtenerUbicacion();
+                console.log('DEBUG (Operador): await obtenerUbicacion inicial completado.');
+
+                console.log('DEBUG (Operador): Llamando a cargarTroncos...');
+                await cargarTroncos();
+                console.log('DEBUG (Operador): await cargarTroncos completado.');
+
+                setLoading(false);
+                console.log('DEBUG (Operador): Carga inicial completada. setLoading(false) ejecutado.');
+
+                // Configurar el intervalo para actualizar ubicación y troncos
+                interval = setInterval(async () => {
+                    console.log('DEBUG (Operador): Intervalo activo: Actualizando ubicación y troncos...');
+                    await obtenerUbicacion();
+                    await cargarTroncos(); // También es bueno recargar troncos periódicamente
+                }, 15000); // Actualiza cada 15 segundos
+            } catch (initError) {
+                console.error('ERROR FATAL (Operador) en initMap:', initError);
+                Alert.alert('Error de Inicialización', 'Ocurrió un error al cargar los datos iniciales del mapa.');
+                setLoading(false);
+            }
         };
 
-        solicitarPermiso();
-        cargarTroncos();
+        if (interval) {
+            clearInterval(interval);
+            interval = undefined;
+            console.log('DEBUG (Operador): Limpiando intervalo anterior.');
+        }
 
-        const interval = setInterval(obtenerUbicacion, 10000);
-        return () => clearInterval(interval);
-    }, []);
+        initMap();
+
+        return () => {
+            if (interval) {
+                clearInterval(interval);
+                console.log('DEBUG (Operador): Cleanup: Intervalo limpiado al desmontar/re-ejecutar efecto.');
+            }
+        };
+    }, [user?.id, currentProject?.id, obtenerUbicacion]); // Add obtenerUbicacion to dependencies
 
     const toggleSeleccionTronco = (id: string) => {
         setSelectedTroncos(prev => {
@@ -188,6 +258,7 @@ const MapaOperadorScreen = () => {
         return (
             <View style={styles.loader}>
                 <ActivityIndicator size="large" color="#7ED321" />
+                <Text style={{ marginTop: 10, color: '#666' }}>Cargando mapa y troncos...</Text>
             </View>
         );
     }
@@ -216,9 +287,9 @@ const MapaOperadorScreen = () => {
                         pinColor={
                             tronco.estado === 'en_espera'
                                 ? selectedTroncos.has(tronco.id)
-                                    ? '#0000FF'
-                                    : '#FFA500'
-                                : '#808080'
+                                    ? '#0000FF' // Azul para seleccionado
+                                    : '#FFA500' // Naranja para en espera
+                                : '#808080' // Gris para en transporte
                         }
                         onPress={() => {
                             if (tronco.estado === 'en_espera' && !drawingMode) {
@@ -243,10 +314,10 @@ const MapaOperadorScreen = () => {
             </MapView>
 
             <View style={styles.bottomButtonsContainer}>
-                {drawingMode ? ( // Renderiza los botones de dibujo si drawingMode es true
+                {drawingMode ? (
                     <>
                         <TouchableOpacity
-                            style={[styles.button, styles.toggleDrawButton]} // Mantén este botón siempre visible
+                            style={[styles.button, styles.toggleDrawButton]}
                             onPress={handleToggleDrawingMode}
                         >
                             <Icon name="gesture-tap-box" size={20} color="#fff" />
@@ -259,10 +330,10 @@ const MapaOperadorScreen = () => {
                             <Text style={styles.buttonText}>Finalizar Dibujo ({drawingCoordinates.length} puntos)</Text>
                         </TouchableOpacity>
                     </>
-                ) : ( // Renderiza los botones de transporte si drawingMode es false
+                ) : (
                     <>
                         <TouchableOpacity
-                            style={[styles.button, styles.toggleDrawButton]} // Este botón es el mismo, pero con texto diferente
+                            style={[styles.button, styles.toggleDrawButton]}
                             onPress={handleToggleDrawingMode}
                         >
                             <Icon name="gesture-tap-box" size={20} color="#fff" />
@@ -272,7 +343,7 @@ const MapaOperadorScreen = () => {
                         <TouchableOpacity
                             style={[
                                 styles.button,
-                                selectedTroncos.size === 0 ? styles.buttonDisabled : styles.buttonPrimary // Un nuevo estilo para el botón habilitado
+                                selectedTroncos.size === 0 ? styles.buttonDisabled : styles.buttonPrimary
                             ]}
                             onPress={() =>
                                 selectedTroncos.size > 0 &&
@@ -308,7 +379,7 @@ const styles = StyleSheet.create({
         left: 20,
         right: 20,
         flexDirection: 'column',
-        gap: 10, // Usar 'gap' si estás en React Native 0.71+, de lo contrario, usa 'marginBottom' en los botones.
+        gap: 10,
     },
     button: {
         flexDirection: 'row',
@@ -317,13 +388,13 @@ const styles = StyleSheet.create({
         padding: 15,
         borderRadius: 10,
         elevation: 5,
-        minHeight: 50, // Asegura una altura mínima para evitar que se "encoga" visualmente
+        minHeight: 50,
     },
     buttonDisabled: {
-        backgroundColor: '#cccccc', // Gris para deshabilitado
+        backgroundColor: '#cccccc',
     },
-    buttonPrimary: { // Nuevo estilo para el botón "Iniciar Transporte" habilitado
-        backgroundColor: '#7ED321', // Verde
+    buttonPrimary: {
+        backgroundColor: '#7ED321',
     },
     buttonText: {
         color: '#fff',
@@ -332,9 +403,9 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
     drawButton: {
-        backgroundColor: '#DC3545', // Rojo para "Finalizar Dibujo"
+        backgroundColor: '#DC3545',
     },
     toggleDrawButton: {
-        backgroundColor: '#007BFF', // Azul para "Activar/Salir del Dibujo"
+        backgroundColor: '#007BFF',
     },
 });
