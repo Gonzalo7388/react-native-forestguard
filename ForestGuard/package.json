@@ -66,5 +66,13 @@
     "jest-expo": "^53.0.9",
     "typescript": "^5.3.3"
   },
-  "private": true
+  "private": true,
+  "jest": {
+    "preset": "jest-expo",
+    "transformIgnorePatterns": [
+      "node_modules/(?!((jest-expo|react-native|@react-native-community|expo(nent)?|@expo(nent)?/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg|react-native-maps)/.*))"
+    ]
+  }
+
+  
 }
