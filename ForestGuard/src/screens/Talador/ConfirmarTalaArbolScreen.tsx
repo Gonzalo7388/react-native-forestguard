@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, Alert, ActivityIndicator } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as Location from 'expo-location';
-import { getFirestore, doc, updateDoc, collection, addDoc, Timestamp } from 'firebase/firestore';
+import { getFirestore, doc, updateDoc, collection, addDoc, Timestamp, getDoc } from 'firebase/firestore';
 import { app } from '../../config/firebase';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { useAuth } from '../../hooks/useAuth';
@@ -14,7 +14,7 @@ const ConfirmarTalaArbolScreen = () => {
   const [loading, setLoading] = useState(false);
   const route = useRoute();
   const navigation = useNavigation();
-  const { user } = useAuth();
+  const { user, currentProject } = useAuth();
   const { arbolId } = route.params as { arbolId: string };
 
   const handleTakePhoto = async () => {
@@ -44,7 +44,7 @@ const ConfirmarTalaArbolScreen = () => {
       const location = await Location.getCurrentPositionAsync({});
       const db = getFirestore(app);
 
-      // Crear registro en colección 'tala_arboles'
+      // 1️⃣ Registrar auditoría en 'tala_arboles'
       await addDoc(collection(db, 'tala_arboles'), {
         arbolId,
         userId: user?.id ?? null,
@@ -54,11 +54,30 @@ const ConfirmarTalaArbolScreen = () => {
         longitud: location.coords.longitude,
       });
 
-      // Actualizar estado del árbol a 'talado'
+      // 2️⃣ Cambiar estado del árbol a 'talado'
       const arbolRef = doc(db, 'arboles', arbolId);
       await updateDoc(arbolRef, { estado: 'talado' });
 
-      Alert.alert('Éxito', 'El árbol ha sido marcado como talado con evidencia.');
+      // 3️⃣ Obtener datos del árbol para crear el tronco asociado
+      const arbolSnap = await getDoc(arbolRef);
+      if (!arbolSnap.exists()) {
+        throw new Error('El árbol no existe en la base de datos.');
+      }
+      const arbolData = arbolSnap.data();
+
+      // 4️⃣ Crear el tronco asociado con estado 'en_espera'
+      await addDoc(collection(db, 'troncos'), {
+        arbolId: arbolId,
+        proyectoId: arbolData.proyectoId ?? (currentProject?.id ?? null),
+        especie: arbolData.especie ?? '',
+        descripcion: arbolData.descripcion ?? '',
+        latitud: arbolData.latitud,
+        longitud: arbolData.longitud,
+        estado: 'en_espera',
+        timestamp: Timestamp.now(),
+      });
+
+      Alert.alert('Éxito', 'El árbol ha sido marcado como talado y el tronco registrado.');
       navigation.goBack();
     } catch (error) {
       console.error('Error al confirmar tala:', error);

@@ -93,6 +93,9 @@ const ProyectosScreen = () => {
             } else if (userRoleInProject === 'talador') {
                 auth.cambiarProyecto(proyecto, 'talador');
                 Alert.alert('Proyecto cambiado', `Ahora estás trabajando en: ${proyecto.nombre} como Talador`);
+            } else if (userRoleInProject === 'operador') {
+                auth.cambiarProyecto(proyecto, 'operador');
+                Alert.alert('Proyecto cambiado', `Ahora estás trabajando en: ${proyecto.nombre} como Operador`);
             } else if (userRoleInProject === 'auxiliar') {
                 auth.cambiarProyecto(proyecto, 'auxiliar');
                 Alert.alert('Proyecto cambiado', `Ahora estás trabajando en: ${proyecto.nombre} como Auxiliar`);

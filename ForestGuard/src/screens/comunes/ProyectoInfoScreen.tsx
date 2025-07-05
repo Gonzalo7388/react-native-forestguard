@@ -12,7 +12,7 @@ const ProyectoInfoScreen = () => {
     const handleIrAProyecto = () => {
         if (!auth) return;
         auth.cambiarProyecto(proyecto, 'administrador');
-        Alert.alert('Proyecto cambiado', `Ahora estás trabajando en: ${proyecto.nombre}`);
+        Alert.alert('Proyecto cambiado', `Ahora estás trabajando en: ${proyecto.nombre} como Administrador`);
         navigation.navigate('Tabs'); // <-- Navega explícitamente al mapa
     };
 
