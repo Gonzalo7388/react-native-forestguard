@@ -11,6 +11,7 @@ import ProyectoInfoScreen from '../screens/comunes/ProyectoInfoScreen';
 import ConfirmarTransporteTroncosScreen from '../screens/Operador/ConfirmarTransporteTroncosScreen';
 import TransporteEnCursoScreen from '../screens/Operador/TransporteEnCursoScreen';
 import DrawerContentOperador from './drawer/DrawerContentOperador';
+import InviteWorkerScreen from '../screens/admin/InviteWorkerScreen';
 
 const Drawer = createDrawerNavigator();
 
@@ -45,9 +46,9 @@ const OperadorDrawerNavigator = () => (
       options={{ title: 'Confirmar Transporte Troncos' }}
     />
     <Drawer.Screen
-      name="TransporteEnCurso"
-      component={TransporteEnCursoScreen}
-      options={{ title: 'Transporte En Curso' }}
+      name="InviteWorker"
+      component={InviteWorkerScreen}
+      options={{ title: 'Invitar Trabajadores' }}
     />
 
     

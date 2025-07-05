@@ -8,6 +8,7 @@ import MarcadorDrawerNavigator from './MarcadorDrawerNavigator';
 import TrazadorDrawerNavigator from './TrazadorDrawerNavigator';
 import TaladorDrawerNavigator from './TaladorDrawerNavigator'; // ✅ Importa tu navigator
 import OperadorDrawerNavigator from './OperadorDrawerNavigator'; // ✅ Agregado
+import AuxiliarDrawerNavigator from './AuxiliarDrawerNavigator'; // ✅ NUEVO
 
 const Stack = createNativeStackNavigator();
 
@@ -28,6 +29,8 @@ const RootNavigator = () => {
         <Stack.Screen name="TaladorDrawerNavigator" component={TaladorDrawerNavigator} />
       ) : auth.currentRole === 'operador' ? ( // ✅ Agregado correctamente
         <Stack.Screen name="OperadorDrawerNavigator" component={OperadorDrawerNavigator} />
+      ) :  auth.currentRole === 'auxiliar' ? ( // ✅ AGREGADO
+        <Stack.Screen name="AuxiliarDrawerNavigator" component={AuxiliarDrawerNavigator} />
       ) : (
         <Stack.Screen name="Onboarding" component={OnboardingNavigator} />
       )}
