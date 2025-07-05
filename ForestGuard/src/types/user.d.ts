@@ -6,4 +6,6 @@ export interface UserType {
     proyectoId?: string;
     proyectos?: { [proyectoId: string]: string };
     estado?: string; // ✅ añadido si deseas utilizarlo
+    phone?: string; // <-- Añade esta línea
+
 }

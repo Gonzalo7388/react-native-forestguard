@@ -7,7 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Header from '../components/Header';
 
 import MapaOperadorScreen from '../screens/Operador/MapaOperadorScreen';
-import RecibirAlertasScreen from '../screens/admin/RecibirAlertasScreen';
+import RecibirAlertasScreen from '../screens/comunes/AlertasScreen';
 
 const Tab = createBottomTabNavigator();
 

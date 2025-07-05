@@ -5,7 +5,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import MapaTaladorScreen from '../screens/Talador/MapaTaladorScreen';
-import RecibirAlertasScreen from '../screens/admin/RecibirAlertasScreen';
+import RecibirAlertasScreen from '../screens/comunes/AlertasScreen';
 import Header from '../components/Header';
 
 const Tab = createBottomTabNavigator();

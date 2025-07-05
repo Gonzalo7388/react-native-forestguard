@@ -34,7 +34,6 @@ const DrawerNavigator = () => {
       <Drawer.Screen name="InviteWorker" component={InviteWorkerScreen} />
       <Drawer.Screen name="Configuracion" component={ConfiguracionScreen} />
       <Drawer.Screen name="ProyectoInfo" component={ProyectoInfoScreen} />
-
     </Drawer.Navigator>
   );
 };

@@ -7,7 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import MapaScreen from '../screens/admin/MapaScreen';
 import EstadisticasScreen from '../screens/admin/EstadisticasScreen';
 import ControlEquiposScreen from '../screens/admin/ControlEquiposScreen';
-import RecibirAlertasScreen from '../screens/admin/RecibirAlertasScreen';
+import RecibirAlertasScreen from '../screens/comunes/AlertasScreen';
 
 import Header from '../components/Header'; // 👈 Importa tu Header modular
 

@@ -7,7 +7,7 @@ import Header from '../components/Header';
 
 // ✅ Pantallas específicas del AUXILIAR
 import MapaAuxiliarScreen from '../screens/Auxiliar/MapaAuxiliarScreen';
-import RecibirAlertasScreen from '../screens/admin/RecibirAlertasScreen';
+import RecibirAlertasScreen from '../screens/comunes/AlertasScreen';
 import ControlEquiposScreen from '../screens/admin/ControlEquiposScreen';
 
 const Tab = createBottomTabNavigator();
