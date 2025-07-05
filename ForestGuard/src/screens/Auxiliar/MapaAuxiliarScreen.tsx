@@ -10,19 +10,16 @@ import {
 } from 'react-native';
 import MapView, { Marker, Polygon, Polyline, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
-import { getFirestore, collection, query, where, getDocs, doc, updateDoc, setDoc, arrayUnion, serverTimestamp, Timestamp } from 'firebase/firestore'; // Importa setDoc y arrayUnion
+// Ya no necesitas importar setDoc, updateDoc, arrayUnion, serverTimestamp, Timestamp aquí
+// La lógica de Firestore para guardar está en locationService.ts
+import { getFirestore, collection, query, where, getDocs, doc } from 'firebase/firestore'; // Mantén solo lo necesario para cargar datos
 import { app } from '../../config/firebase';
 import { useAuth } from '../../hooks/useAuth';
+// Importa el nuevo servicio de ubicación
+import { saveUserLocation } from '../../services/locationService'; // <--- NUEVA IMPORTACIÓN
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-// --- Interfaces para Firestore ---
-// Define la estructura de un punto de ubicación para la colección de recorrido
-interface LocationPoint {
-    latitude: number;
-    longitude: number;
-    timestamp: Timestamp; // Usamos Timestamp de Firebase para guardar
-}
-
+// --- Interfaces (las mantienes si las usas para workers, etc.) ---
 type Worker = {
     id: string;
     nombre: string;
@@ -41,62 +38,8 @@ const MapaAuxiliarScreen = () => {
 
     const db = getFirestore(app);
 
-    // Función auxiliar para formatear la fecha a YYYY-MM-DD
-    const formatDateForFirestoreDoc = (date: Date): string => {
-        const year = date.getFullYear();
-        const month = (date.getMonth() + 1).toString().padStart(2, '0');
-        const day = date.getDate().toString().padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    };
-
-    const guardarMiUbicacionEnFirestore = useCallback(async (currentLocation: Location.LocationObject) => {
-        console.log('DEBUG: guardando mi ubicacion en firestore. User ID:', user?.id);
-        if (!user?.id || !currentProject?.id) { // Asegúrate de tener el ID del proyecto también
-            console.warn('guardarMiUbicacionEnFirestore: No hay usuario o proyecto logueado para guardar la ubicación. Retornando.');
-            return;
-        }
-
-        try {
-            // Parte 1: Actualizar la ubicación en el documento del usuario (como ya lo haces)
-            const userDocRef = doc(db, 'usuarios', user.id);
-            await updateDoc(userDocRef, {
-                location: {
-                    latitude: currentLocation.coords.latitude,
-                    longitude: currentLocation.coords.longitude,
-                },
-                lastLocationUpdate: serverTimestamp(),
-            });
-            console.log('DEBUG: Mi última ubicación en el perfil de usuario actualizada en Firestore.');
-
-            // Parte 2: Guardar la ubicación en la colección de recorrido diario
-            const today = new Date();
-            const formattedDate = formatDateForFirestoreDoc(today);
-            // El ID del documento será userId_projectId_YYYY-MM-DD
-            const pathDocId = `${user.id}_${currentProject.id}_${formattedDate}`;
-            const pathDocRef = doc(db, 'ubicaciones_recorrido', pathDocId);
-
-            const newLocationPoint: LocationPoint = {
-                latitude: currentLocation.coords.latitude,
-                longitude: currentLocation.coords.longitude,
-                timestamp: Timestamp.now(), // Usa Timestamp.now() para el punto exacto
-            };
-
-            // Intentar actualizar el documento existente (añadir al array locations)
-            // Si el documento no existe, setDoc lo creará. merge: true es importante
-            // para que no sobrescriba todo el documento si ya existe.
-            await setDoc(pathDocRef, {
-                userId: user.id,
-                projectId: currentProject.id,
-                date: formattedDate,
-                locations: arrayUnion(newLocationPoint) // Añade el nuevo punto al array
-            }, { merge: true }); // Usamos merge para no sobrescribir el documento completo
-
-            console.log('DEBUG: Punto de ubicación añadido al recorrido diario en Firestore.');
-
-        } catch (error) {
-            console.error('ERROR AL GUARDAR MI UBICACION EN FIRESTORE:', error);
-        }
-    }, [user?.id, currentProject?.id, db]); // Añade currentProject.id a las dependencias
+    // *** ELIMINAMOS guardarMiUbicacionEnFirestore de aquí ***
+    // La lógica de guardado está ahora en src/services/locationService.ts
 
     const obtenerUbicacion = useCallback(async () => {
         console.log('DEBUG: Iniciando obtenerUbicacion...');
@@ -104,10 +47,20 @@ const MapaAuxiliarScreen = () => {
             const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
             console.log('DEBUG: Ubicación obtenida:', loc.coords);
             setLocation(loc);
+            
             // Asegúrate de que user y currentProject estén definidos antes de guardar
             if (loc && user?.id && currentProject?.id) { 
-                console.log('DEBUG: Llamando a guardarMiUbicacionEnFirestore desde obtenerUbicacion.');
-                await guardarMiUbicacionEnFirestore(loc);
+                console.log('DEBUG: Llamando a saveUserLocation desde obtenerUbicacion.');
+                // *** AQUÍ ESTÁ EL CAMBIO CLAVE: LLAMAS AL SERVICIO EXTERNO ***
+                await saveUserLocation(
+                    user.id,
+                    currentProject.id,
+                    {
+                        latitude: loc.coords.latitude,
+                        longitude: loc.coords.longitude,
+                        timestamp: new Date(loc.timestamp) // Convierte a Date para el servicio
+                    }
+                );
             } else {
                 console.log('DEBUG: No se guarda la ubicación porque loc es nulo o user.id/currentProject.id no existe.');
             }
@@ -117,7 +70,8 @@ const MapaAuxiliarScreen = () => {
         } finally {
             console.log('DEBUG: obtenerUbicacion finalizada.');
         }
-    }, [guardarMiUbicacionEnFirestore, user?.id, currentProject?.id]); // Añade currentProject.id aquí también
+    }, [user?.id, currentProject?.id]); // Las dependencias se mantienen porque necesitas user.id y currentProject.id
+
 
     const cargarWorkers = useCallback(async () => {
         console.log('DEBUG: Iniciando cargarWorkers...');
@@ -257,7 +211,7 @@ const MapaAuxiliarScreen = () => {
                 console.log('DEBUG: Permisos de ubicación concedidos.');
 
                 console.log('DEBUG: Llamando a obtenerUbicacion...');
-                await obtenerUbicacion();
+                await obtenerUbicacion(); // Esto ahora llama a saveUserLocation internamente
                 console.log('DEBUG: await obtenerUbicacion completado.');
 
                 console.log('DEBUG: Llamando a cargarWorkers...');
@@ -275,11 +229,12 @@ const MapaAuxiliarScreen = () => {
                 setLoading(false);
                 console.log('DEBUG: Todas las cargas iniciales completadas. setLoading(false) ejecutado.');
 
+                // Establecer el intervalo solo si los permisos están concedidos y hay usuario/proyecto
                 intervalId = setInterval(async () => {
                     console.log('DEBUG: Intervalo activo: Actualizando ubicación y trabajadores...');
-                    await obtenerUbicacion();
+                    await obtenerUbicacion(); // Esto ahora llamará a saveUserLocation
                     await cargarWorkers();
-                }, 10000);
+                }, 10000); // Actualiza cada 10 segundos
 
             } catch (initError) {
                 console.error('ERROR FATAL EN initAndStartInterval:', initError);
@@ -288,13 +243,14 @@ const MapaAuxiliarScreen = () => {
             }
         };
 
+        // Limpiar cualquier intervalo existente al re-renderizar o desmontar
         if (intervalId) {
             clearInterval(intervalId);
             intervalId = undefined;
             console.log('DEBUG: Limpiando intervalo anterior.');
         }
 
-        initAndStartInterval();
+        initAndStartInterval(); // Llama a la función para iniciar todo
 
         return () => {
             if (intervalId) {
@@ -372,7 +328,10 @@ const MapaAuxiliarScreen = () => {
                 style={styles.centerButton}
                 onPress={() => {
                     if (location) {
-                        obtenerUbicacion();
+                        // Puedes centrar el mapa a la ubicación actual del usuario aquí
+                        // Esto requiere una referencia al MapView o controlar la región del estado
+                        // Por simplicidad, solo llamamos a obtenerUbicacion de nuevo para asegurar que se actualice la vista
+                        obtenerUbicacion(); 
                     }
                 }}
             >
